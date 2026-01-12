@@ -8,17 +8,17 @@
   <style>
     *{box-sizing:border-box}
 
-    /* Gør hele iframe-fladen til flex så indholdet centreres */
+    /* Gennemsigtig iframe + centrering */
     html,body{
       margin:0;
       padding:0;
       height:100%;
-      background:#f9fafb;
+      background:transparent;   /* 👈 VIGTIGT */
       font-family:Arial,sans-serif;
 
       display:flex;
-      align-items:center;     /* lodret centrering */
-      justify-content:center; /* vandret centrering */
+      align-items:center;
+      justify-content:center;
     }
 
     .wrap{
@@ -36,7 +36,7 @@
       padding:12px;
       box-shadow:0 4px 10px rgba(0,0,0,.06);
       width:100%;
-      max-width:420px; /* så den ikke flyder for bredt */
+      max-width:420px;
     }
 
     .title{
