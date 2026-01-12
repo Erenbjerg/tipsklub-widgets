@@ -18,7 +18,13 @@
     .name{font-weight:800}
     .pill{font-size:12px;font-weight:900;padding:5px 10px;border-radius:999px;background:#e0e7ff;color:#3730a3}
 
-    /* Mobil: 1 kolonne (så den ikke scroller inde i iframe) */
+    /* Medaljer (top 3) */
+    .row.gold{background:linear-gradient(90deg,#fff7cc,#ffffff)}
+    .row.silver{background:linear-gradient(90deg,#f3f4f6,#ffffff)}
+    .row.bronze{background:linear-gradient(90deg,#fde7d9,#ffffff)}
+    .medal{font-size:16px;margin-right:6px}
+
+    /* Mobil: lidt tighter */
     @media (max-width:640px){
       .wrap{padding:8px}
       .row{grid-template-columns:22px 1fr auto}
@@ -44,17 +50,29 @@
       .then(r => r.json())
       .then(d => {
         const stats = (d.stats || []).slice(0, 5);
+        const el = document.getElementById("list");
+
         if (!stats.length) {
-          document.getElementById("list").innerHTML = "Ingen data endnu";
+          el.innerHTML = "Ingen data endnu";
           return;
         }
-        document.getElementById("list").innerHTML = stats.map((p,i) => `
-          <div class="row">
-            <div class="rank">${i+1}</div>
-            <div class="name">${esc(p.name)}</div>
-            <div class="pill">${esc(p.hits ?? 0)}</div>
-          </div>
-        `).join("");
+
+        el.innerHTML = stats.map((p, i) => {
+          let cls = "";
+          let medal = "";
+
+          if (i === 0) { cls = "gold"; medal = "🥇"; }
+          else if (i === 1) { cls = "silver"; medal = "🥈"; }
+          else if (i === 2) { cls = "bronze"; medal = "🥉"; }
+
+          return `
+            <div class="row ${cls}">
+              <div class="rank">${i + 1}</div>
+              <div class="name"><span class="medal">${medal}</span>${esc(p.name)}</div>
+              <div class="pill">${esc(p.hits ?? 0)}</div>
+            </div>
+          `;
+        }).join("");
       })
       .catch(e => {
         document.getElementById("list").innerHTML = "Fejl: " + esc(e.message);
