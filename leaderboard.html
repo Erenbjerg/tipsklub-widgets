@@ -4,19 +4,79 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Leaderboard</title>
+
   <style>
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:#f9fafb;font-family:Arial,sans-serif}
-    .wrap{padding:10px}
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px;box-shadow:0 4px 10px rgba(0,0,0,.06)}
-    .title{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-    h3{margin:0;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:#374151}
+
+    /* Gør hele iframe-fladen til flex så indholdet centreres */
+    html,body{
+      margin:0;
+      padding:0;
+      height:100%;
+      background:#f9fafb;
+      font-family:Arial,sans-serif;
+
+      display:flex;
+      align-items:center;     /* lodret centrering */
+      justify-content:center; /* vandret centrering */
+    }
+
+    .wrap{
+      width:100%;
+      padding:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .card{
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      padding:12px;
+      box-shadow:0 4px 10px rgba(0,0,0,.06);
+      width:100%;
+      max-width:420px; /* så den ikke flyder for bredt */
+    }
+
+    .title{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px
+    }
+
+    h3{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      color:#374151
+    }
+
     .sub{font-size:12px;color:#6b7280}
-    .row{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #f3f4f6}
+
+    .row{
+      display:grid;
+      grid-template-columns:26px 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:8px 0;
+      border-top:1px solid #f3f4f6
+    }
+
     .row:first-of-type{border-top:0}
+
     .rank{font-weight:900;color:#111827;text-align:right}
     .name{font-weight:800}
-    .pill{font-size:12px;font-weight:900;padding:5px 10px;border-radius:999px;background:#e0e7ff;color:#3730a3}
+    .pill{
+      font-size:12px;
+      font-weight:900;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#e0e7ff;
+      color:#3730a3
+    }
 
     /* Medaljer (top 3) */
     .row.gold{background:linear-gradient(90deg,#fff7cc,#ffffff)}
@@ -24,13 +84,14 @@
     .row.bronze{background:linear-gradient(90deg,#fde7d9,#ffffff)}
     .medal{font-size:16px;margin-right:6px}
 
-    /* Mobil: lidt tighter */
+    /* Mobil */
     @media (max-width:640px){
       .wrap{padding:8px}
       .row{grid-template-columns:22px 1fr auto}
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card">
@@ -43,10 +104,14 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH/exec";
-    const esc = (s) => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH/exec";
 
-    fetch(API_URL, { cache: "no-store" })
+    const esc = s => (s ?? "").toString()
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;");
+
+    fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
       .then(r => r.json())
       .then(d => {
         const stats = (d.stats || []).slice(0, 5);
@@ -68,14 +133,15 @@
           return `
             <div class="row ${cls}">
               <div class="rank">${i + 1}</div>
-              <div class="name"><span class="medal">${medal}</span>${esc(p.name)}</div>
+              <div class="name">${medal ? `<span class="medal">${medal}</span>` : ``}${esc(p.name)}</div>
               <div class="pill">${esc(p.hits ?? 0)}</div>
             </div>
           `;
         }).join("");
       })
       .catch(e => {
-        document.getElementById("list").innerHTML = "Fejl: " + esc(e.message);
+        document.getElementById("list").innerHTML =
+          "Fejl: " + esc(e.message);
       });
   </script>
 </body>
