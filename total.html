@@ -4,118 +4,80 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Årets total</title>
-
 <style>
   *{box-sizing:border-box}
-
-  html,body{
-    margin:0;
-    padding:0;
-    background:#0b0f14;
-    font-family:Inter,Arial,sans-serif;
-    color:#f9fafb;
-  }
-
-  .wrap{
-    padding:16px;
-  }
-
+  html,body{margin:0;padding:0;background:#0b0f14;font-family:Inter,Arial,sans-serif;color:#f9fafb}
+  .wrap{padding:16px}
   .card{
     background:radial-gradient(900px 400px at top,#1f2937,#020617);
-    border:1px solid #1f2937;
-    border-radius:22px;
-    padding:22px;
-    text-align:center;
-    box-shadow:0 30px 60px rgba(0,0,0,.65);
+    border:1px solid #1f2937;border-radius:22px;padding:22px;text-align:center;
+    box-shadow:0 30px 60px rgba(0,0,0,.65)
   }
-
-  .label{
-    letter-spacing:.3em;
-    text-transform:uppercase;
-    font-size:12px;
-    color:#fbbf24;
-    margin-bottom:8px;
-  }
-
-  .amount{
-    font-size:46px;
-    font-weight:900;
-    line-height:1;
-  }
-
-  .amount.positive{
-    color:#22c55e;
-    text-shadow:0 0 18px rgba(34,197,94,.4);
-  }
-
-  .amount.negative{
-    color:#ef4444;
-    text-shadow:0 0 18px rgba(239,68,68,.45);
-  }
-
-  .currency{
-    margin-top:4px;
-    font-size:16px;
-    font-weight:800;
-    color:#9ca3af;
-  }
-
-  .sub{
-    margin-top:10px;
-    font-size:12px;
-    color:#6b7280;
-  }
+  .label{letter-spacing:.3em;text-transform:uppercase;font-size:12px;color:#fbbf24;margin-bottom:8px}
+  .amount{font-size:46px;font-weight:900;line-height:1}
+  .amount.positive{color:#22c55e;text-shadow:0 0 18px rgba(34,197,94,.4)}
+  .amount.negative{color:#ef4444;text-shadow:0 0 18px rgba(239,68,68,.45)}
+  .currency{margin-top:4px;font-size:16px;font-weight:800;color:#9ca3af}
+  .sub{margin-top:10px;font-size:12px;color:#6b7280}
+  .err{margin-top:10px;font-size:12px;color:#fca5a5}
 </style>
 </head>
-
 <body>
 <div class="wrap">
   <div class="card">
     <div class="label">Årets total</div>
     <div id="amount" class="amount">0</div>
-    <div class="currency">DKK</div>
-    <div class="sub">Opdateres automatisk</div>
+    <div id="err" class="err"></div>
   </div>
 </div>
 
 <script>
-const API_URL =
-  "https://script.google.com/macros/s/AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH/exec";
+  // VIGTIGT: Denne skal matche den /exec du testede i incognito
+  const API_URL = "https://script.google.com/macros/s/AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH/exec";
 
-function animate(el, target){
-  let current = 0;
-  const direction = target >= 0 ? 1 : -1;
-  const steps = 70;
-  const step = Math.max(1, Math.floor(Math.abs(target) / steps));
+  function setErr(msg){ document.getElementById("err").innerText = msg || ""; }
 
-  const timer = setInterval(() => {
-    current += step * direction;
+  function animate(el, target){
+    let current = 0;
+    const dir = target >= 0 ? 1 : -1;
+    const steps = 70;
+    const step = Math.max(1, Math.floor(Math.abs(target) / steps));
 
-    if ((direction === 1 && current >= target) ||
-        (direction === -1 && current <= target)) {
-      current = target;
-      clearInterval(timer);
-    }
+    const timer = setInterval(() => {
+      current += step * dir;
 
-    el.innerText = current.toLocaleString("da-DK");
-  }, 20);
-}
+      if ((dir === 1 && current >= target) || (dir === -1 && current <= target)) {
+        current = target;
+        clearInterval(timer);
+      }
+      el.innerText = current.toLocaleString("da-DK");
+    }, 20);
+  }
 
-fetch(API_URL, { cache: "no-store" })
-  .then(r => r.json())
-  .then(data => {
-    const total = Number(data.total || 0);
-    const el = document.getElementById("amount");
+  fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !("total" in data)) {
+        setErr("API svarer uden 'total'.");
+        return;
+      }
 
-    el.classList.remove("positive","negative");
-    el.classList.add(total >= 0 ? "positive" : "negative");
+      const total = Number(data.total);
+      if (!Number.isFinite(total)) {
+        setErr("Kunne ikke læse total: " + String(data.total));
+        return;
+      }
 
-    animate(el, total);
-  })
-  .catch(() => {
-    document.getElementById("amount").innerText = "—";
-  });
+      const el = document.getElementById("amount");
+      el.classList.remove("positive","negative");
+      el.classList.add(total >= 0 ? "positive" : "negative");
+
+      setErr("");
+      animate(el, total);
+    })
+    .catch(e => {
+      setErr("Fetch fejl: " + (e && e.message ? e.message : String(e)));
+    });
 </script>
-
 </body>
 </html>
