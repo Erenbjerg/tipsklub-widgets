@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fuld stilling</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#f9fafb;font-family:Arial,sans-serif}
+    .wrap{padding:10px}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px;box-shadow:0 4px 10px rgba(0,0,0,.06)}
+    h3{margin:0 0 10px 0;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:#374151}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #f3f4f6;font-size:13px}
+    th{text-align:left;color:#6b7280;font-weight:900}
+    td.num{text-align:right;font-weight:900}
+    td.rank{font-weight:900;width:28px}
+
+    tr.gold{background:#fff7cc}
+    tr.silver{background:#f3f4f6}
+    tr.bronze{background:#fde7d9}
+
+    .medal{margin-right:6px}
+
+    .scroll{max-height:520px;overflow:auto;border-radius:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h3>Fuld stilling</h3>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Navn</th>
+              <th style="text-align:right;">Ramt</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr><td colspan="3">Indlæser…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH/exec";
+    const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+    fetch(API_URL, { cache: "no-store" })
+      .then(r => r.json())
+      .then(d => {
+        const stats = d.stats || [];
+        const el = document.getElementById("rows");
+
+        if (!stats.length) {
+          el.innerHTML = "<tr><td colspan='3'>Ingen data</td></tr>";
+          return;
+        }
+
+        el.innerHTML = stats.map((p,i) => {
+          let cls = "";
+          let medal = "";
+
+          if (i === 0) { cls = "gold"; medal = "🥇"; }
+          else if (i === 1) { cls = "silver"; medal = "🥈"; }
+          else if (i === 2) { cls = "bronze"; medal = "🥉"; }
+
+          return `
+            <tr class="${cls}">
+              <td class="rank">${i+1}</td>
+              <td>${medal ? `<span class="medal">${medal}</span>` : ``}${esc(p.name)}</td>
+              <td class="num">${esc(p.hits ?? 0)}</td>
+            </tr>
+          `;
+        }).join("");
+      })
+      .catch(e => {
+        document.getElementById("rows").innerHTML =
+          "<tr><td colspan='3'>Fejl: "+esc(e.message)+"</td></tr>";
+      });
+  </script>
+</body>
+</html>
