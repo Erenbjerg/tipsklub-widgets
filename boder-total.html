@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bøder total</title>
+
+<style>
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:transparent;
+    font-family:Inter,Arial,sans-serif;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .wrap{width:100%;padding:12px;display:flex;justify-content:center}
+  .card{
+    width:100%;
+    max-width:520px;
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    border:1px solid #e5e7eb;
+    background:radial-gradient(900px 420px at top,#ffffff,#f8fafc);
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+  }
+  .label{
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:12px;
+    color:#6b7280;
+    margin-bottom:8px;
+    font-weight:900;
+  }
+  .amount{
+    font-size:44px;
+    font-weight:900;
+    line-height:1;
+    color:#991b1b;
+    text-shadow:0 0 18px rgba(153,27,27,.15);
+  }
+  .amount.good{color:#166534;text-shadow:0 0 18px rgba(22,101,52,.15)}
+  .unit{margin-top:6px;font-size:14px;font-weight:900;color:#9ca3af}
+  .sub{margin-top:10px;font-size:12px;color:#6b7280}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="label">Bøder total</div>
+    <div id="amount" class="amount">0</div>
+    <div class="unit">DKK</div>
+    <div id="sub" class="sub">Opdateres automatisk</div>
+  </div>
+</div>
+
+<script>
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl/exec";
+
+  const fmt = n => Number(n || 0).toLocaleString("da-DK");
+
+  function animate(el, target){
+    let current = 0;
+    const dir = target >= 0 ? 1 : -1;
+    const steps = 70;
+    const step = Math.max(1, Math.floor(Math.abs(target) / steps));
+
+    const timer = setInterval(() => {
+      current += step * dir;
+      if ((dir === 1 && current >= target) || (dir === -1 && current <= target)) {
+        current = target;
+        clearInterval(timer);
+      }
+      el.innerText = fmt(current);
+    }, 20);
+  }
+
+  fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
+    .then(r => r.json())
+    .then(d => {
+      const val = Number(d.boderTotal);
+      const el = document.getElementById("amount");
+
+      // Bøder er typisk "dårligt" når tallet er højt -> rød
+      // Hvis du vil have den altid rød, så fjern denne if.
+      if (val <= 0) el.classList.add("good");
+
+      animate(el, val);
+    })
+    .catch(() => {
+      document.getElementById("sub").innerText = "Kunne ikke hente data";
+    });
+</script>
+</body>
+</html>
