@@ -42,6 +42,7 @@
   .amount.good{color:#166534;text-shadow:0 0 18px rgba(22,101,52,.15)}
   .unit{margin-top:6px;font-size:14px;font-weight:900;color:#9ca3af}
   .sub{margin-top:10px;font-size:12px;color:#6b7280}
+  .err{margin-top:10px;font-size:12px;color:#b91c1c}
 </style>
 </head>
 
@@ -51,6 +52,7 @@
     <div class="label">Bøder total</div>
     <div id="amount" class="amount">0</div>
     <div class="unit">DKK</div>
+    <div id="err" class="err"></div>
   </div>
 </div>
 
@@ -59,6 +61,7 @@
     "https://script.google.com/macros/s/AKfycbw7RzHmSwFOyN-JmLNR7qlt-prbVoOe5dEKkvOlus2LzZH2s7eJtwWceeIzysesubTj/exec";
 
   const fmt = n => Number(n || 0).toLocaleString("da-DK");
+  const setErr = msg => document.getElementById("err").innerText = msg || "";
 
   function animate(el, target){
     let current = 0;
@@ -79,17 +82,26 @@
   fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
     .then(r => r.json())
     .then(d => {
-      const val = Number(d.boderTotal);
-      const el = document.getElementById("amount");
+      if (!d || !("boderTotal" in d)) {
+        setErr("API svarer uden 'boderTotal'.");
+        return;
+      }
 
-      // Bøder er typisk "dårligt" når tallet er højt -> rød
-      // Hvis du vil have den altid rød, så fjern denne if.
+      const val = Number(d.boderTotal);
+      if (!Number.isFinite(val)) {
+        setErr("Kunne ikke læse boderTotal: " + String(d.boderTotal));
+        return;
+      }
+
+      const el = document.getElementById("amount");
+      el.classList.remove("good");
       if (val <= 0) el.classList.add("good");
 
+      setErr("");
       animate(el, val);
     })
-    .catch(() => {
-      document.getElementById("sub").innerText = "Kunne ikke hente data";
+    .catch(e => {
+      setErr("Kunne ikke hente data: " + (e && e.message ? e.message : String(e)));
     });
 </script>
 </body>
