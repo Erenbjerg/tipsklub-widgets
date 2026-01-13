@@ -29,20 +29,34 @@
 
   .card{
     width:100%;
-    max-width:520px;
+    max-width:720px; /* 👈 bredere */
     background:#fff;
     border:1px solid #e5e7eb;
-    border-radius:14px;
-    padding:12px;
-    box-shadow:0 4px 10px rgba(0,0,0,.06);
+    border-radius:16px;
+    padding:14px;
+    box-shadow:0 6px 16px rgba(0,0,0,.08);
+  }
+
+  .header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:6px;
   }
 
   h3{
-    margin:0 0 6px 0;
+    margin:0;
     font-size:14px;
-    letter-spacing:.04em;
+    letter-spacing:.08em;
     text-transform:uppercase;
     color:#374151;
+  }
+
+  .hint{
+    font-size:12px;
+    color:#6b7280;
+    white-space:nowrap;
   }
 
   .group{
@@ -50,7 +64,7 @@
   }
 
   .group:first-of-type{
-    margin-top:6px;
+    margin-top:8px;
   }
 
   .group-title{
@@ -59,15 +73,25 @@
     color:#6b7280;
     letter-spacing:.08em;
     text-transform:uppercase;
-    margin-bottom:4px;
+    margin:10px 0 6px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .group-title:after{
+    content:'';
+    height:1px;
+    background:#f3f4f6;
+    flex:1;
   }
 
   .row{
     display:grid;
     grid-template-columns:1fr auto;
-    gap:10px;
+    gap:12px;
     align-items:center;
-    padding:8px 0;
+    padding:10px 0;
     border-top:1px solid #f3f4f6;
   }
 
@@ -75,29 +99,65 @@
     border-top:0;
   }
 
-  .name{
-    font-weight:800;
-    color:#111827;
+  .left{
+    min-width:0;
   }
- 
-.meta{
-  margin-top:3px;
-  font-size:12px;
-  color:#6b7280;
-  line-height:1.25;
-}
-.meta b{color:#111827}
 
+  .name{
+    font-weight:900;
+    color:#111827;
+    font-size:16px;
+    line-height:1.1;
+  }
+
+  /* Chips i én linje på desktop – wrap på mobil */
+  .chips{
+    margin-top:6px;
+    display:flex;
+    gap:8px;
+    flex-wrap:nowrap;     /* 👈 prøv at holde én linje */
+    overflow:hidden;      /* 👈 og undgå at den skubber layout */
+  }
+
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    color:#374151;
+    background:#f3f4f6;
+    white-space:nowrap;
+    flex:0 0 auto;
+  }
+
+  /* lidt casino vibes */
+  .chip.tage{background:#fef3c7;color:#92400e;}
+  .chip.adam{background:#e0e7ff;color:#3730a3;}
+  .chip.aeg{background:#ecfeff;color:#155e75;}
+  .chip.runde{background:#ffe4e6;color:#9f1239;}
 
   .pill{
     font-size:12px;
     font-weight:900;
-    padding:6px 10px;
+    padding:8px 12px;
     border-radius:999px;
     background:#fee2e2;
     color:#991b1b;
-    min-width:84px;
+    min-width:96px;
     text-align:center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    white-space:nowrap;
+  }
+
+  /* Mobil: wrap chips, og giv lidt mindre spacing */
+  @media (max-width:520px){
+    .card{padding:12px}
+    .name{font-size:15px}
+    .chips{flex-wrap:wrap; overflow:visible;}
+    .pill{min-width:84px; padding:7px 10px}
   }
 </style>
 </head>
@@ -105,18 +165,20 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <h3>Bøder</h3>
+    <div class="header">
+      <h3>Bøder</h3>
+      <div class="hint">Samlet oversigt · pr. gruppe</div>
+    </div>
     <div id="list">Indlæser…</div>
   </div>
 </div>
 
 <script>
   const API_URL =
-    "https://script.google.com/macros/s/AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl/exec"; // <-- indsæt din /exec her
+    "https://script.google.com/macros/s/AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl/exec";
 
-  const esc = s => (s ?? "").toString()
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
+  const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const fmt = n => Number(n || 0).toLocaleString("da-DK");
 
   fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
     .then(r => r.json())
@@ -136,30 +198,41 @@
         (groups[g] ||= []).push(p);
       });
 
-      el.innerHTML = Object.keys(groups).sort().map(g => `
+      // Behold rækkefølgen G1,G2,G3 hvis muligt
+      const order = ["G1","G2","G3"];
+      const keys = Object.keys(groups).sort((a,b)=>{
+        const ia = order.indexOf(a), ib = order.indexOf(b);
+        if (ia === -1 && ib === -1) return a.localeCompare(b);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      });
+
+      el.innerHTML = keys.map(g => `
         <div class="group">
           <div class="group-title">${esc(g)}</div>
-          ${groups[g].map(p => `
-  <div class="row">
-    <div>
-      <div class="name">${esc(p.name)}</div>
-      <div class="meta">
-        🥐 Tage: <b>${Number(p.breakdown?.tage||0)}</b> (${Number(p.breakdown?.antalTage||0)}x)
-        &nbsp;·&nbsp; 🎯 Adam: <b>${Number(p.breakdown?.adam||0)}</b> (${Number(p.breakdown?.antalAdam||0)}x)
-        &nbsp;·&nbsp; 🥚 Æg: <b>${Number(p.breakdown?.aeg||0)}</b>
-        &nbsp;·&nbsp; 💥 Runde tabt: <b>${Number(p.breakdown?.rundeTabt||0)}</b>
-      </div>
-    </div>
-    <div class="pill">${Number(p.total||0).toLocaleString("da-DK")} kr</div>
-  </div>
-`).join("")}
-
+          ${groups[g].map(p => {
+            const bd = p.breakdown || {};
+            return `
+              <div class="row">
+                <div class="left">
+                  <div class="name">${esc(p.name)}</div>
+                  <div class="chips">
+                    <span class="chip tage">🥐 Tage: <b>${fmt(bd.tage)}</b> (${fmt(bd.antalTage)}x)</span>
+                    <span class="chip adam">🎯 Adam: <b>${fmt(bd.adam)}</b> (${fmt(bd.antalAdam)}x)</span>
+                    <span class="chip aeg">🥚 Æg: <b>${fmt(bd.aeg)}</b></span>
+                    <span class="chip runde">💥 Runde tabt: <b>${fmt(bd.rundeTabt)}</b></span>
+                  </div>
+                </div>
+                <div class="pill">${fmt(p.total)} kr</div>
+              </div>
+            `;
+          }).join("")}
         </div>
       `).join("");
     })
     .catch(e => {
-      document.getElementById("list").innerHTML =
-        "Fejl: " + esc(e.message);
+      document.getElementById("list").innerHTML = "Fejl: " + esc(e.message);
     });
 </script>
 </body>
