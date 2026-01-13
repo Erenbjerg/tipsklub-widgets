@@ -79,6 +79,15 @@
     font-weight:800;
     color:#111827;
   }
+ 
+.meta{
+  margin-top:3px;
+  font-size:12px;
+  color:#6b7280;
+  line-height:1.25;
+}
+.meta b{color:#111827}
+
 
   .pill{
     font-size:12px;
@@ -131,11 +140,20 @@
         <div class="group">
           <div class="group-title">${esc(g)}</div>
           ${groups[g].map(p => `
-            <div class="row">
-              <div class="name">${esc(p.name)}</div>
-              <div class="pill">${Number(p.total||0).toLocaleString("da-DK")} kr</div>
-            </div>
-          `).join("")}
+  <div class="row">
+    <div>
+      <div class="name">${esc(p.name)}</div>
+      <div class="meta">
+        🥐 Tage: <b>${Number(p.breakdown?.tage||0)}</b> (${Number(p.breakdown?.antalTage||0)}x)
+        &nbsp;·&nbsp; 🎯 Adam: <b>${Number(p.breakdown?.adam||0)}</b> (${Number(p.breakdown?.antalAdam||0)}x)
+        &nbsp;·&nbsp; 🥚 Æg: <b>${Number(p.breakdown?.aeg||0)}</b>
+        &nbsp;·&nbsp; 💥 Runde tabt: <b>${Number(p.breakdown?.rundeTabt||0)}</b>
+      </div>
+    </div>
+    <div class="pill">${Number(p.total||0).toLocaleString("da-DK")} kr</div>
+  </div>
+`).join("")}
+
         </div>
       `).join("");
     })
