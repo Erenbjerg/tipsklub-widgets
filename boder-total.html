@@ -37,12 +37,21 @@
     font-weight:900;
     line-height:1;
     color:#991b1b;
-    text-shadow:0 0 18px rgba(153,27,27,.15);
   }
-  .amount.good{color:#166534;text-shadow:0 0 18px rgba(22,101,52,.15)}
   .unit{margin-top:6px;font-size:14px;font-weight:900;color:#9ca3af}
   .sub{margin-top:10px;font-size:12px;color:#6b7280}
   .err{margin-top:10px;font-size:12px;color:#b91c1c}
+  pre{
+    text-align:left;
+    margin:10px 0 0;
+    padding:10px;
+    border-radius:12px;
+    background:#0b0f14;
+    color:#e5e7eb;
+    font-size:11px;
+    overflow:auto;
+    max-height:180px;
+  }
 </style>
 </head>
 
@@ -52,7 +61,9 @@
     <div class="label">Bøder total</div>
     <div id="amount" class="amount">0</div>
     <div class="unit">DKK</div>
+    <div id="sub" class="sub">Debug aktiv (skal vise API-svar)</div>
     <div id="err" class="err"></div>
+    <pre id="debug">Indlæser…</pre>
   </div>
 </div>
 
@@ -80,28 +91,34 @@
   }
 
   fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
-    .then(r => r.json())
-    .then(d => {
+    .then(r => r.text())
+    .then(t => {
+      document.getElementById("debug").innerText = t;
+
+      let d;
+      try { d = JSON.parse(t); }
+      catch(e){
+        setErr("Svar er ikke JSON (tjek debug-boksen).");
+        return;
+      }
+
       if (!d || !("boderTotal" in d)) {
-        setErr("API svarer uden 'boderTotal'.");
+        setErr("API svarer uden 'boderTotal' (tjek debug-boksen).");
         return;
       }
 
       const val = Number(d.boderTotal);
       if (!Number.isFinite(val)) {
-        setErr("Kunne ikke læse boderTotal: " + String(d.boderTotal));
+        setErr("boderTotal er ikke et tal: " + String(d.boderTotal));
         return;
       }
 
-      const el = document.getElementById("amount");
-      el.classList.remove("good");
-      if (val <= 0) el.classList.add("good");
-
       setErr("");
-      animate(el, val);
+      animate(document.getElementById("amount"), val);
     })
     .catch(e => {
-      setErr("Kunne ikke hente data: " + (e && e.message ? e.message : String(e)));
+      setErr("Fetch fejl: " + (e && e.message ? e.message : String(e)));
+      document.getElementById("debug").innerText = "(ingen svar)";
     });
 </script>
 </body>
