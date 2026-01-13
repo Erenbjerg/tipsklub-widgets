@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bøder</title>
+
+<style>
+  *{box-sizing:border-box}
+
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    background:transparent;
+    font-family:Arial,sans-serif;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .wrap{
+    width:100%;
+    padding:10px;
+    display:flex;
+    justify-content:center;
+  }
+
+  .card{
+    width:100%;
+    max-width:520px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,.06);
+  }
+
+  h3{
+    margin:0 0 6px 0;
+    font-size:14px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:#374151;
+  }
+
+  .group{
+    margin-top:14px;
+  }
+
+  .group:first-of-type{
+    margin-top:6px;
+  }
+
+  .group-title{
+    font-size:12px;
+    font-weight:900;
+    color:#6b7280;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+
+  .row{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:10px;
+    align-items:center;
+    padding:8px 0;
+    border-top:1px solid #f3f4f6;
+  }
+
+  .row:first-of-type{
+    border-top:0;
+  }
+
+  .name{
+    font-weight:800;
+    color:#111827;
+  }
+
+  .pill{
+    font-size:12px;
+    font-weight:900;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#fee2e2;
+    color:#991b1b;
+    min-width:84px;
+    text-align:center;
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="card">
+    <h3>Bøder</h3>
+    <div id="list">Indlæser…</div>
+  </div>
+</div>
+
+<script>
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl/exec"; // <-- indsæt din /exec her
+
+  const esc = s => (s ?? "").toString()
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+
+  fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
+    .then(r => r.json())
+    .then(d => {
+      const rows = d.boder || [];
+      const el = document.getElementById("list");
+
+      if (!rows.length) {
+        el.innerHTML = "Ingen bøder endnu";
+        return;
+      }
+
+      // Gruppér efter gruppe
+      const groups = {};
+      rows.forEach(p => {
+        const g = p.gruppe || "Ukendt";
+        (groups[g] ||= []).push(p);
+      });
+
+      el.innerHTML = Object.keys(groups).sort().map(g => `
+        <div class="group">
+          <div class="group-title">${esc(g)}</div>
+          ${groups[g].map(p => `
+            <div class="row">
+              <div class="name">${esc(p.name)}</div>
+              <div class="pill">${Number(p.total||0).toLocaleString("da-DK")} kr</div>
+            </div>
+          `).join("")}
+        </div>
+      `).join("");
+    })
+    .catch(e => {
+      document.getElementById("list").innerHTML =
+        "Fejl: " + esc(e.message);
+    });
+</script>
+</body>
+</html>
