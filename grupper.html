@@ -14,7 +14,7 @@
       background:transparent;
       font-family:'Roboto', sans-serif;
       display:flex; 
-      align-items:flex-start; /* Starter i toppen */
+      align-items:flex-start; 
       justify-content:center;
     }
 
@@ -23,43 +23,45 @@
       display:flex; justify-content:center;
     }
 
-    /* Gitter der ALTID er 3 kolonner */
     .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr; /* 3 lige store kolonner */
-      gap: 8px; /* Lidt mindre mellemrum så der er plads på mobil */
-      width: 100%; max-width: 900px;
+      grid-template-columns: 1fr 1fr 1fr; 
+      gap: 16px; /* Mere luft mellem kasserne */
+      width: 100%; max-width: 1000px; /* Tillad dem at blive bredere */
     }
 
     .card {
       background: rgba(20, 20, 20, 0.95);
       border: 2px solid #C5A059;
-      border-radius: 14px;
-      padding: 12px 6px; /* Mindre padding i siderne for at spare plads */
+      border-radius: 16px;
+      padding: 20px 10px; /* Meget mere luft indeni */
       box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
       color: #fff;
       text-align: center;
       display: flex; flex-direction: column;
+      min-height: 200px; /* Sikrer at de har en god højde selv med få navne */
     }
 
     h3 {
-      margin: 0 0 8px 0;
+      margin: 0 0 12px 0;
       font-family: 'Playfair Display', serif;
-      font-size: 14px; color: #C5A059;
+      font-size: 20px; /* Større overskrift */
+      color: #C5A059;
       text-transform: uppercase; letter-spacing: .05em;
-      border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-      padding-bottom: 6px;
-      white-space: nowrap; /* Sikrer overskriften ikke knækker */
+      border-bottom: 2px solid rgba(197, 160, 89, 0.3);
+      padding-bottom: 10px;
+      white-space: nowrap; 
       overflow: hidden; text-overflow: ellipsis;
     }
 
     ul { list-style: none; margin: 0; padding: 0; flex: 1; }
 
     li {
-      font-size: 13px; font-weight: 700; /* Lidt mindre skrift */
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      color: #ddd; letter-spacing: 0.3px;
+      font-size: 16px; /* Større navne */
+      font-weight: 700; 
+      padding: 10px 0; /* Mere plads mellem navnene */
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: #fff; letter-spacing: 0.5px;
     }
     li:last-child { border-bottom: none; }
   </style>
@@ -87,7 +89,6 @@
 
 <script>
   // --- KONFIGURATION START ---
-  // HER ER DIT NYE ID INDSAT KORREKT:
   const DEFAULT_ID = "AKfycbz7F-b7fhMC3_uttHCShGxWyYQwPX_X6aKiYshLJHfr3aLFrdQll4IyF9ivCmN_NUDH";
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
