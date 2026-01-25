@@ -3,116 +3,83 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Bøder</title>
+<title>The Debt List</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
   *{box-sizing:border-box}
 
   html,body{
-    margin:0;
-    padding:0;
-    height:100%;
+    margin:0; padding:0; height:100%;
     background:transparent;
-    font-family:Arial,sans-serif;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    font-family:'Roboto', sans-serif;
+    display:flex; align-items:center; justify-content:center;
   }
 
   .wrap{
-    width:100%;
-    padding:10px;
-    display:flex;
-    justify-content:center;
+    width:100%; padding:10px;
+    display:flex; justify-content:center;
   }
 
   .card{
-    width:100%;
-    max-width:760px; /* 👈 bred nok til én linje */
-    background:#fff;
-    border:1px solid #e5e7eb;
+    width:100%; max-width:760px;
+    background: rgba(20, 20, 20, 0.95);
+    border: 2px solid #C5A059; /* Guld */
     border-radius:16px;
-    padding:14px;
-    box-shadow:0 6px 16px rgba(0,0,0,.08);
+    padding:16px;
+    box-shadow:0 0 20px rgba(197, 160, 89, 0.15);
+    color: #fff;
   }
 
   h3{
-    margin:0 0 8px 0;
-    font-size:14px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:#374151;
+    margin:0 0 12px 0;
+    font-family: 'Playfair Display', serif;
+    font-size:18px; color: #C5A059;
+    letter-spacing:.08em; text-transform:uppercase;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.5);
+    padding-bottom: 10px;
   }
 
-  .group{
-    margin-top:14px;
-  }
+  .group{ margin-top:16px; }
 
   .group-title{
-    font-size:12px;
-    font-weight:900;
-    color:#6b7280;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    margin:10px 0 6px 0;
+    font-size:12px; font-weight:900;
+    color:#888; letter-spacing:.1em;
+    text-transform:uppercase; margin:10px 0 6px 0;
   }
 
   .row{
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:14px;
-    align-items:center;
-    padding:10px 0;
-    border-top:1px solid #f3f4f6;
+    display:grid; grid-template-columns:1fr auto;
+    gap:14px; align-items:center;
+    padding:12px 0;
+    border-top:1px solid rgba(255,255,255,0.1);
   }
-
   .row:first-of-type{border-top:0}
 
   .name{
-    font-weight:900;
-    font-size:16px;
-    color:#111827;
-    margin-bottom:4px;
+    font-weight:700; font-size:16px;
+    color:#fff; margin-bottom:4px;
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 0.5px;
   }
 
-  /* KOMPAKT META – ALT PÅ ÉN LINJE */
+  /* Meta data styling */
   .meta{
-    font-size:12px;
-    color:#374151;
-    white-space:nowrap;      /* 👈 tving én linje */
-    overflow:hidden;
-    text-overflow:ellipsis;
+    font-size:12px; color:#aaa;
+    line-height:1.4;
   }
+  .meta span{ margin-right:12px; display:inline-block; }
+  .meta b{ color:#C5A059; font-weight:normal; } /* Guld tal i teksten */
 
-  .meta span{
-    margin-right:10px;
-    color:#6b7280;
-  }
-
-  .meta b{
-    color:#111827;
-    font-weight:900;
-  }
-
+  /* Prisen - Neon Rød */
   .pill{
-    font-size:12px;
-    font-weight:900;
-    padding:8px 14px;
-    border-radius:999px;
-    background:#fee2e2;
-    color:#991b1b;
-    min-width:96px;
-    text-align:center;
+    font-size:14px; font-weight:900;
+    padding:8px 14px; border-radius:8px;
+    background:rgba(153, 27, 27, 0.15);
+    color:#ff4444; border: 1px solid #991b1b;
+    min-width:96px; text-align:center;
     white-space:nowrap;
-  }
-
-  /* Mobil: tillad wrap */
-  @media (max-width:640px){
-    .card{padding:12px}
-    .meta{
-      white-space:normal;   /* 👈 må wrap på mobil */
-      line-height:1.3;
-    }
+    text-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
   }
 </style>
 </head>
@@ -120,24 +87,19 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <h3>Bøder</h3>
-    <div id="list">Indlæser…</div>
+    <h3>💸 Bøder</h3>
+    <div id="list">Henter gældsbogen...</div>
   </div>
 </div>
 
 <script>
-  // --- KONFIGURATION START ---
-  // Dette er ID'et til din nuværende 25/26 sæson.
+  // --- KONFIGURATION ---
   const DEFAULT_ID = "AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl";
-
-  // Tjekker om linket har ?id=...
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
-
-  // Vælger ID: Linket vinder, ellers standard
   const scriptId = urlId || DEFAULT_ID;
   const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
-  // --- KONFIGURATION SLUT ---
+  // --- SLUT ---
 
   const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const fmt = n => Number(n || 0).toLocaleString("da-DK");
@@ -148,10 +110,7 @@
       const rows = d.boder || [];
       const el = document.getElementById("list");
 
-      if (!rows.length) {
-        el.innerHTML = "Ingen bøder endnu";
-        return;
-      }
+      if (!rows.length) { el.innerHTML = "Ingen bøder endnu"; return; }
 
       const groups = {};
       rows.forEach(p => {
@@ -163,8 +122,7 @@
       const keys = Object.keys(groups).sort((a,b)=>{
         const ia = order.indexOf(a), ib = order.indexOf(b);
         if (ia === -1 && ib === -1) return a.localeCompare(b);
-        if (ia === -1) return 1;
-        if (ib === -1) return -1;
+        if (ia === -1) return 1; if (ib === -1) return -1;
         return ia - ib;
       });
 
@@ -178,10 +136,10 @@
                 <div>
                   <div class="name">${esc(p.name)}</div>
                   <div class="meta">
-                    <span>Tage <b>${fmt(b.tage)}</b> (${fmt(b.antalTage)}x)</span>
-                    <span>Adam <b>${fmt(b.adam)}</b> (${fmt(b.antalAdam)}x)</span>
-                    <span>Æg <b>${fmt(b.aeg)}</b></span>
-                    <span>Runde tabt <b>${fmt(b.rundeTabt)}</b></span>
+                    <span>Tage: <b>${fmt(b.tage)}</b> (${fmt(b.antalTage)}x)</span>
+                    <span>Adam: <b>${fmt(b.adam)}</b> (${fmt(b.antalAdam)}x)</span>
+                    <span>Æg: <b>${fmt(b.aeg)}</b></span>
+                    <span>Runde tabt: <b>${fmt(b.rundeTabt)}</b></span>
                   </div>
                 </div>
                 <div class="pill">${fmt(p.total)} kr</div>
@@ -192,11 +150,8 @@
       `).join("");
     })
     .catch(e => {
-      document.getElementById("list").innerText = "Fejl: Kunne ikke hente data.";
-      console.error(e);
+      document.getElementById("list").innerText = "Fejl: " + e.message;
     });
 </script>
 </body>
 </html>
-
-```
