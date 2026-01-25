@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grupper</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0; padding:0; height:100%;
+      background:transparent;
+      font-family:'Roboto', sans-serif;
+      display:flex; 
+      align-items:flex-start; /* Starter i toppen ligesom de andre */
+      justify-content:center;
+    }
+
+    .wrap{
+      width:100%; padding:10px; padding-top:20px;
+      display:flex; justify-content:center;
+    }
+
+    /* Gitter til de 3 grupper - står ved siden af hinanden på PC */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; 
+      gap: 16px;
+      width: 100%; max-width: 800px;
+    }
+
+    .card {
+      background: rgba(20, 20, 20, 0.95);
+      border: 2px solid #C5A059; /* Guld kant */
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
+      color: #fff;
+      text-align: center;
+    }
+
+    h3 {
+      margin: 0 0 12px 0;
+      font-family: 'Playfair Display', serif;
+      font-size: 16px; color: #C5A059;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+      padding-bottom: 8px;
+    }
+
+    ul { list-style: none; margin: 0; padding: 0; }
+
+    li {
+      font-size: 14px; font-weight: 700;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #ddd; letter-spacing: 0.5px;
+    }
+    li:last-child { border-bottom: none; }
+
+    /* Mobil: Vis dem under hinanden i stedet */
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <h3>Gruppe 1</h3>
+      <ul id="g1"><li>Dealer kortene...</li></ul>
+    </div>
+    
+    <div class="card">
+      <h3>Gruppe 2</h3>
+      <ul id="g2"><li>Dealer kortene...</li></ul>
+    </div>
+
+    <div class="card">
+      <h3>Gruppe 3</h3>
+      <ul id="g3"><li>Dealer kortene...</li></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- KONFIGURATION START ---
+  // HUSK AT SÆTTE DIT RIGTIGE ID IND HER, HVIS DET HAR ÆNDRET SIG
+  const DEFAULT_ID = "AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH";
+  const params = new URLSearchParams(window.location.search);
+  const urlId = params.get("id");
+  const scriptId = urlId || DEFAULT_ID;
+  const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
+  // --- KONFIGURATION SLUT ---
+
+  const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
+    .then(r => r.json())
+    .then(d => {
+      const g = d.grupper;
+      if (!g) {
+        document.getElementById("g1").innerHTML = "<li>Ingen data</li>";
+        return;
+      }
+
+      const fill = (id, list) => {
+        const el = document.getElementById(id);
+        if(!list || list.length === 0) {
+          el.innerHTML = "<li>Ingen spillere</li>";
+        } else {
+          el.innerHTML = list.map(n => `<li>${esc(n)}</li>`).join("");
+        }
+      };
+
+      fill("g1", g.g1);
+      fill("g2", g.g2);
+      fill("g3", g.g3);
+    })
+    .catch(e => {
+      console.error(e);
+      document.getElementById("g1").innerText = "Fejl";
+    });
+</script>
+</body>
+</html>
