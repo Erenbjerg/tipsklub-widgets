@@ -68,8 +68,18 @@
 </div>
 
 <script>
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycbwPiEOeSOq9kUmm8-B9RaOlVJPzg9u3xaDScxOD-f2q4aFg_lFLAzC6N5Mv2Gs4gDOR/exec";
+  // --- KONFIGURATION START ---
+  // Dette er ID'et til din nuværende 25/26 sæson.
+  const DEFAULT_ID = "AKfycbwPiEOeSOq9kUmm8-B9RaOlVJPzg9u3xaDScxOD-f2q4aFg_lFLAzC6N5Mv2Gs4gDOR";
+
+  // Tjekker om linket har ?id=...
+  const params = new URLSearchParams(window.location.search);
+  const urlId = params.get("id");
+
+  // Vælger ID: Linket vinder, ellers standard
+  const scriptId = urlId || DEFAULT_ID;
+  const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
+  // --- KONFIGURATION SLUT ---
 
   function setErr(msg){ document.getElementById("err").innerText = msg || ""; }
 
