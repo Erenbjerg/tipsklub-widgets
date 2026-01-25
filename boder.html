@@ -1,3 +1,10 @@
+Her er den opdaterede kode til **`boder.html`**.
+
+Jeg har gjort præcis det samme som før: Jeg har trukket ID'et ud, så den bruger det "gamle" ID som standard (så din nuværende side virker), men den er klar til at tage imod et nyt ID via linket, når du starter næste sæson.
+
+Kopier hele koden herunder og erstat alt indholdet i din fil `boder.html` på GitHub:
+
+```html
 <!doctype html>
 <html lang="da">
 <head>
@@ -126,8 +133,18 @@
 </div>
 
 <script>
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl/exec";
+  // --- KONFIGURATION START ---
+  // Dette er ID'et til din nuværende 25/26 sæson.
+  const DEFAULT_ID = "AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl";
+
+  // Tjekker om linket har ?id=...
+  const params = new URLSearchParams(window.location.search);
+  const urlId = params.get("id");
+
+  // Vælger ID: Linket vinder, ellers standard
+  const scriptId = urlId || DEFAULT_ID;
+  const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
+  // --- KONFIGURATION SLUT ---
 
   const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const fmt = n => Number(n || 0).toLocaleString("da-DK");
@@ -182,8 +199,11 @@
       `).join("");
     })
     .catch(e => {
-      document.getElementById("list").innerText = "Fejl: " + e.message;
+      document.getElementById("list").innerText = "Fejl: Kunne ikke hente data.";
+      console.error(e);
     });
 </script>
 </body>
 </html>
+
+```
