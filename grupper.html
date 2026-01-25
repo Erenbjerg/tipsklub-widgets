@@ -14,7 +14,7 @@
       background:transparent;
       font-family:'Roboto', sans-serif;
       display:flex; 
-      align-items:flex-start; /* Starter i toppen ligesom de andre */
+      align-items:flex-start; /* Starter i toppen */
       justify-content:center;
     }
 
@@ -23,47 +23,45 @@
       display:flex; justify-content:center;
     }
 
-    /* Gitter til de 3 grupper - står ved siden af hinanden på PC */
+    /* Gitter der ALTID er 3 kolonner */
     .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr; 
-      gap: 16px;
-      width: 100%; max-width: 800px;
+      grid-template-columns: 1fr 1fr 1fr; /* 3 lige store kolonner */
+      gap: 8px; /* Lidt mindre mellemrum så der er plads på mobil */
+      width: 100%; max-width: 900px;
     }
 
     .card {
       background: rgba(20, 20, 20, 0.95);
-      border: 2px solid #C5A059; /* Guld kant */
-      border-radius: 16px;
-      padding: 16px;
+      border: 2px solid #C5A059;
+      border-radius: 14px;
+      padding: 12px 6px; /* Mindre padding i siderne for at spare plads */
       box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
       color: #fff;
       text-align: center;
+      display: flex; flex-direction: column;
     }
 
     h3 {
-      margin: 0 0 12px 0;
+      margin: 0 0 8px 0;
       font-family: 'Playfair Display', serif;
-      font-size: 16px; color: #C5A059;
+      font-size: 14px; color: #C5A059;
       text-transform: uppercase; letter-spacing: .05em;
       border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-      padding-bottom: 8px;
+      padding-bottom: 6px;
+      white-space: nowrap; /* Sikrer overskriften ikke knækker */
+      overflow: hidden; text-overflow: ellipsis;
     }
 
-    ul { list-style: none; margin: 0; padding: 0; }
+    ul { list-style: none; margin: 0; padding: 0; flex: 1; }
 
     li {
-      font-size: 14px; font-weight: 700;
-      padding: 8px 0;
+      font-size: 13px; font-weight: 700; /* Lidt mindre skrift */
+      padding: 6px 0;
       border-bottom: 1px solid rgba(255,255,255,0.05);
-      color: #ddd; letter-spacing: 0.5px;
+      color: #ddd; letter-spacing: 0.3px;
     }
     li:last-child { border-bottom: none; }
-
-    /* Mobil: Vis dem under hinanden i stedet */
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
@@ -72,25 +70,24 @@
   <div class="grid">
     <div class="card">
       <h3>Gruppe 1</h3>
-      <ul id="g1"><li>Dealer kortene...</li></ul>
+      <ul id="g1"><li>...</li></ul>
     </div>
     
     <div class="card">
       <h3>Gruppe 2</h3>
-      <ul id="g2"><li>Dealer kortene...</li></ul>
+      <ul id="g2"><li>...</li></ul>
     </div>
 
     <div class="card">
       <h3>Gruppe 3</h3>
-      <ul id="g3"><li>Dealer kortene...</li></ul>
+      <ul id="g3"><li>...</li></ul>
     </div>
   </div>
 </div>
 
 <script>
   // --- KONFIGURATION START ---
-  // HUSK AT SÆTTE DIT RIGTIGE ID IND HER, HVIS DET HAR ÆNDRET SIG
-  const DEFAULT_ID = "AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH";
+  const DEFAULT_ID = "AKfycbxfajkxsjkwidsABjzygBzNpfpXMXAUCRICUduFICK_F3buA7DPC7zTsg2RCRr963yI";
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
   const scriptId = urlId || DEFAULT_ID;
@@ -103,15 +100,12 @@
     .then(r => r.json())
     .then(d => {
       const g = d.grupper;
-      if (!g) {
-        document.getElementById("g1").innerHTML = "<li>Ingen data</li>";
-        return;
-      }
+      if (!g) return;
 
       const fill = (id, list) => {
         const el = document.getElementById(id);
         if(!list || list.length === 0) {
-          el.innerHTML = "<li>Ingen spillere</li>";
+          el.innerHTML = "<li>-</li>";
         } else {
           el.innerHTML = list.map(n => `<li>${esc(n)}</li>`).join("");
         }
@@ -123,7 +117,6 @@
     })
     .catch(e => {
       console.error(e);
-      document.getElementById("g1").innerText = "Fejl";
     });
 </script>
 </body>
