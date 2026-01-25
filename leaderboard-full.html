@@ -1,3 +1,10 @@
+Her er den opdaterede kode til **`leaderboard-full.html`**.
+
+Princippet er præcis det samme som de andre: Jeg har trukket ID'et ud som standard, så den virker nu, men er klar til fremtiden via `?id=` linket.
+
+Kopier hele koden og erstat indholdet i `leaderboard-full.html` på GitHub:
+
+```html
 <!doctype html>
 <html lang="da">
 <head>
@@ -48,10 +55,23 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH/exec";
+    // --- KONFIGURATION START ---
+    // Dette er ID'et til din nuværende 25/26 sæson.
+    const DEFAULT_ID = "AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH";
+
+    // Tjekker om linket har ?id=...
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get("id");
+
+    // Vælger ID: Linket vinder, ellers standard
+    const scriptId = urlId || DEFAULT_ID;
+    const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
+    // --- KONFIGURATION SLUT ---
+
     const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
-    fetch(API_URL, { cache: "no-store" })
+    // Tilføjer timestamp for at undgå cache (?_=...)
+    fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
       .then(r => r.json())
       .then(d => {
         const stats = d.stats || [];
@@ -86,3 +106,5 @@
   </script>
 </body>
 </html>
+
+```
