@@ -13,31 +13,35 @@
       margin: 0; padding: 0; height: 100%;
       background: transparent;
       font-family: 'Roboto', sans-serif;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; 
+      align-items: flex-start; /* Starter i toppen */
+      justify-content: center;
     }
 
     .wrap {
-      width: 100%; padding: 10px;
+      width: 100%; 
+      padding: 10px;
+      padding-top: 20px; /* Plads til gløden i toppen */
       display: flex; align-items: center; justify-content: center;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: 1fr; /* 👈 Her er ændringen: 1 kolonne */
+      grid-template-columns: 1fr; /* 1 kolonne = vertikal */
       gap: 16px;
       width: 100%;
-      max-width: 360px; /* Lidt smallere, så det ser pænt ud stablet */
+      max-width: 360px;
     }
 
     .card {
       background: rgba(20, 20, 20, 0.95);
-      border: 2px solid #C5A059; /* Guld kant */
+      border: 2px solid #C5A059;
       border-radius: 16px;
       padding: 16px;
       box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
       color: #fff;
       display: flex; flex-direction: column; justify-content: space-between;
-      text-align: center; /* Centreret tekst ser godt ud på kortene */
+      text-align: center;
     }
 
     h3 {
@@ -67,17 +71,15 @@
       padding: 6px 14px; border-radius: 999px;
       font-size: 11px; font-weight: 900;
       text-transform: uppercase; letter-spacing: 0.5px;
-      margin: 0 auto; /* Centrerer pillen */
+      margin: 0 auto;
     }
 
-    /* Tage: Neon Rød stil */
     .tage .pill {
       background: rgba(153, 27, 27, 0.2);
       border: 1px solid #ef4444; color: #ef4444;
       box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
     }
 
-    /* Adam: Neon Blå stil */
     .adam .pill {
       background: rgba(55, 48, 163, 0.2);
       border: 1px solid #6366f1; color: #6366f1;
@@ -106,13 +108,11 @@
 </div>
 
 <script>
-  // --- KONFIGURATION START ---
   const DEFAULT_ID = "AKfycbxfajkxsjkwidsABjzygBzNpfpXMXAUCRICUduFICK_F3buA7DPC7zTsg2RCRr963yI";
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
   const scriptId = urlId || DEFAULT_ID;
   const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
-  // --- KONFIGURATION SLUT ---
 
   const esc = s => (s ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const tageName = document.getElementById('tageName');
