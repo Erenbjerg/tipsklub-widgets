@@ -3,56 +3,69 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Årets total</title>
+<title>Casino Total</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
   *{box-sizing:border-box}
 
-  /* Gennemsigtig iframe-baggrund + centrering */
   html,body{
-    margin:0;
-    padding:0;
-    height:100%;
-    background:transparent;   /* 👈 VIGTIGSTE LINJE */
-    font-family:Inter,Arial,sans-serif;
-    color:#f9fafb;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    margin:0; padding:0; height:100%;
+    background:transparent;
+    font-family:'Roboto', sans-serif;
+    display:flex; align-items:center; justify-content:center;
   }
 
   .wrap{
-    width:100%;
-    padding:16px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    width:100%; padding:10px;
+    display:flex; align-items:center; justify-content:center;
   }
 
   .card{
-    background:radial-gradient(900px 400px at top,#1f2937,#020617);
-    border:1px solid #1f2937;
-    border-radius:22px;
-    padding:22px;
+    /* Mørk baggrund */
+    background: rgba(20, 20, 20, 0.9);
+    /* Guld kant */
+    border: 2px solid #C5A059;
+    border-radius: 22px;
+    padding: 22px;
     text-align:center;
-    box-shadow:0 30px 60px rgba(0,0,0,.65);
-    max-width:520px;
-    width:100%;
+    /* Glød */
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
+    max-width:520px; width:100%;
+    color: #fff;
   }
 
   .label{
-    letter-spacing:.3em;
+    font-family: 'Playfair Display', serif;
+    letter-spacing:.2em;
     text-transform:uppercase;
-    font-size:12px;
-    color:#fbbf24;
-    margin-bottom:8px;
+    font-size:14px;
+    color:#C5A059; /* Guld */
+    margin-bottom:10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   }
 
-  .amount{font-size:46px;font-weight:900;line-height:1}
-  .amount.positive{color:#22c55e;text-shadow:0 0 18px rgba(34,197,94,.4)}
-  .amount.negative{color:#ef4444;text-shadow:0 0 18px rgba(239,68,68,.45)}
-  .currency{margin-top:4px;font-size:16px;font-weight:800;color:#9ca3af}
+  .amount{
+    font-size:52px; font-weight:900; line-height:1;
+    font-family: 'Playfair Display', serif;
+  }
+  
+  /* Neon Grøn for overskud */
+  .amount.positive{
+    color:#39ff14; 
+    text-shadow:0 0 10px rgba(57, 255, 20, 0.6);
+  }
+  
+  /* Neon Rød for underskud */
+  .amount.negative{
+    color:#ff073a;
+    text-shadow:0 0 10px rgba(255, 7, 58, 0.6);
+  }
+  
+  .currency{
+    margin-top:4px; font-size:16px; font-weight:700; 
+    color:#aaa; letter-spacing: 1px;
+  }
   .err{margin-top:10px;font-size:12px;color:#fca5a5}
 </style>
 </head>
@@ -60,7 +73,7 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <div class="label">Årets total</div>
+    <div class="label">♣️ House Bankroll ♣️</div>
     <div id="amount" class="amount">0</div>
     <div class="currency">DKK</div>
     <div id="err" class="err"></div>
@@ -69,14 +82,9 @@
 
 <script>
   // --- KONFIGURATION START ---
-  // Dette er ID'et til din nuværende 25/26 sæson.
   const DEFAULT_ID = "AKfycbwPiEOeSOq9kUmm8-B9RaOlVJPzg9u3xaDScxOD-f2q4aFg_lFLAzC6N5Mv2Gs4gDOR";
-
-  // Tjekker om linket har ?id=...
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
-
-  // Vælger ID: Linket vinder, ellers standard
   const scriptId = urlId || DEFAULT_ID;
   const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
   // --- KONFIGURATION SLUT ---
@@ -91,8 +99,7 @@
 
     const timer = setInterval(() => {
       current += step * dir;
-      if ((dir === 1 && current >= target) ||
-          (dir === -1 && current <= target)) {
+      if ((dir === 1 && current >= target) || (dir === -1 && current <= target)) {
         current = target;
         clearInterval(timer);
       }
@@ -103,27 +110,17 @@
   fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
     .then(r => r.json())
     .then(data => {
-      if (!data || !("total" in data)) {
-        setErr("API svarer uden 'total'.");
-        return;
-      }
-
+      if (!data || !("total" in data)) return;
       const total = Number(data.total);
-      if (!Number.isFinite(total)) {
-        setErr("Kunne ikke læse total: " + String(data.total));
-        return;
-      }
+      if (!Number.isFinite(total)) return;
 
       const el = document.getElementById("amount");
       el.classList.remove("positive","negative");
       el.classList.add(total >= 0 ? "positive" : "negative");
-
       setErr("");
       animate(el, total);
     })
-    .catch(e => {
-      setErr("Fetch fejl: " + (e && e.message ? e.message : String(e)));
-    });
+    .catch(e => { setErr("Fejl"); });
 </script>
 </body>
 </html>
