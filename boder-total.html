@@ -1,3 +1,8 @@
+Her er den opdaterede kode til `boder-total.html`.
+
+Kopier hele koden herunder og erstat alt indholdet i din fil på GitHub.
+
+```html
 <!doctype html>
 <html lang="da">
 <head>
@@ -58,8 +63,19 @@
 </div>
 
 <script>
-  const API_URL =
-    "https://script.google.com/macros/s/AKfycbw7RzHmSwFOyN-JmLNR7qlt-prbVoOe5dEKkvOlus2LzZH2s7eJtwWceeIzysesubTj/exec";
+  // --- KONFIGURATION START ---
+  // Dette er ID'et til din nuværende 25/26 sæson.
+  // Hvis du ikke skriver "?id=..." i linket, bruges denne som standard.
+  const DEFAULT_ID = "AKfycbw7RzHmSwFOyN-JmLNR7qlt-prbVoOe5dEKkvOlus2LzZH2s7eJtwWceeIzysesubTj";
+
+  // Vi tjekker om linket indeholder "?id=NYT_ID"
+  const params = new URLSearchParams(window.location.search);
+  const urlId = params.get("id");
+
+  // Vælg det rigtige ID: Linket vinder over standarden
+  const scriptId = urlId || DEFAULT_ID;
+  const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
+  // --- KONFIGURATION SLUT ---
 
   const fmt = n => Number(n || 0).toLocaleString("da-DK");
   const setErr = msg => document.getElementById("err").innerText = msg || "";
@@ -80,6 +96,7 @@
     }, 20);
   }
 
+  // Henter data (bruger en 'dummy' parameter for at undgå caching)
   fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
     .then(r => r.json())
     .then(d => {
@@ -102,8 +119,11 @@
       animate(el, val);
     })
     .catch(e => {
-      setErr("Kunne ikke hente data: " + (e && e.message ? e.message : String(e)));
+      setErr("Kunne ikke hente data.");
+      console.error(e);
     });
 </script>
 </body>
 </html>
+
+```
