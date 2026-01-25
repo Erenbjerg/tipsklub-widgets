@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fuld Stilling</title>
+  <title>Fuld Stilling Stor</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -13,95 +13,105 @@
       background:transparent;
       font-family:'Roboto', sans-serif;
       display:flex; 
-      align-items:flex-start; /* Starter i toppen */
+      align-items:flex-start; 
       justify-content:center;
     }
     .wrap{
         width:100%; 
         padding:10px;
-        padding-top: 20px; /* Plads til glød */
-        display:flex; align-items:center; justify-content:center;
+        padding-top: 20px; 
+        display:flex; align-items:flex-start; justify-content:center;
     }
     
     .card{
       background: rgba(20, 20, 20, 0.95);
       border: 2px solid #C5A059;
-      border-radius:14px; padding:12px;
-      box-shadow:0 0 20px rgba(197, 160, 89, 0.2);
+      border-radius:18px; 
+      padding: 30px; /* Mere luft indeni */
+      box-shadow:0 0 25px rgba(197, 160, 89, 0.25);
       color: #fff;
       width: 100%;
-      max-width: 500px; /* Lidt bredere tabel */
+      max-width: 1000px; /* Meget bredere tabel */
     }
     
     h3{
-      margin:0 0 10px 0;
+      margin:0 0 20px 0;
       font-family: 'Playfair Display', serif;
-      font-size:16px; color:#C5A059;
-      letter-spacing:.04em; text-transform:uppercase;
-      border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-      padding-bottom: 8px;
+      font-size: 28px; /* Stor overskrift */
+      color:#C5A059;
+      letter-spacing:.05em; text-transform:uppercase;
+      border-bottom: 2px solid rgba(197, 160, 89, 0.4);
+      padding-bottom: 15px;
+      text-align: center;
     }
 
     table{width:100%; border-collapse:collapse;}
-    th,td{padding:12px 8px; border-bottom:1px solid rgba(255,255,255,0.1); font-size:14px;}
+    
+    /* Store celler */
+    th,td{
+        padding: 16px 12px; 
+        border-bottom:1px solid rgba(255,255,255,0.1); 
+        font-size: 18px; /* Større tekst generelt */
+    }
     
     th{
       text-align:left; color:#888; font-weight:900;
-      text-transform: uppercase; font-size: 11px;
+      text-transform: uppercase; font-size: 14px; letter-spacing: 1px;
     }
     
-    td.rank{ font-family: 'Playfair Display', serif; color: #C5A059; font-weight:900; width:30px;}
-    td.name{ font-weight: 700; }
+    td.rank{ 
+        font-family: 'Playfair Display', serif; 
+        color: #C5A059; font-weight:900; 
+        width:60px; font-size: 24px; text-align: center;
+    }
     
+    td.name{ font-weight: 700; font-size: 20px; }
+    
+    /* Store chips til point */
     .chip {
-      display: inline-block;
-      min-width: 30px; height: 30px; line-height: 30px;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 45px; height: 45px; /* Større chip */
       border-radius: 50%;
-      background: #1f2937; border: 1px solid #374151;
-      text-align: center; font-weight: 900; font-size: 12px;
+      background: #1f2937; border: 2px solid #374151;
+      font-weight: 900; font-size: 18px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
 
     /* Top 3 Highlighting */
-    tr.gold td { color: #fbbf24; }
+    tr.gold td { color: #fbbf24; background: rgba(251, 191, 36, 0.05); }
     tr.gold .chip { background: radial-gradient(circle, #fbbf24, #b45309); color: #000; border-color:#fff; }
     
-    tr.silver td { color: #e5e7eb; }
+    tr.silver td { color: #e5e7eb; background: rgba(229, 231, 235, 0.05); }
     tr.silver .chip { background: radial-gradient(circle, #f3f4f6, #9ca3af); color: #000; border-color:#fff; }
     
-    tr.bronze td { color: #fdba74; }
+    tr.bronze td { color: #fdba74; background: rgba(253, 186, 116, 0.05); }
     tr.bronze .chip { background: radial-gradient(circle, #fdba74, #c2410c); color: #000; border-color:#fff; }
 
-    .medal{margin-right:6px;}
-    
-    /* HER ER RETTELSEN: scroll klassen gør ingenting nu, så den fylder det hele */
-    .scroll{
-      border-radius:8px;
-    }
+    .medal{margin-right:10px; font-size: 24px;}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h3>♠️ Fuld stilling</h3>
-      <div class="scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Navn</th>
-              <th style="text-align:right;">Ramt</th>
-            </tr>
-          </thead>
-          <tbody id="rows">
-            <tr><td colspan="3">Blander kortene…</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <h3>♠️ Fuld stilling ♠️</h3>
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:center">#</th>
+            <th>Navn</th>
+            <th style="text-align:right;">Ramt</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="3" style="text-align:center; padding:30px;">Blander kortene…</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <script>
-    const DEFAULT_ID = "AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH";
+    // DIT NYE ID ER INDSAT HER:
+    const DEFAULT_ID = "AKfycbz7F-b7fhMC3_uttHCShGxWyYQwPX_X6aKiYshLJHfr3aLFrdQll4IyF9ivCmN_NUDH";
     const params = new URLSearchParams(window.location.search);
     const urlId = params.get("id");
     const scriptId = urlId || DEFAULT_ID;
@@ -116,7 +126,7 @@
         const el = document.getElementById("rows");
 
         if (!stats.length) {
-          el.innerHTML = "<tr><td colspan='3'>Ingen data</td></tr>";
+          el.innerHTML = "<tr><td colspan='3' style='text-align:center'>Ingen data</td></tr>";
           return;
         }
 
@@ -125,8 +135,8 @@
           let medal = "";
 
           if (i === 0) { cls = "gold"; medal = "🏆"; }
-          else if (i === 1) { cls = "silver"; medal = ""; }
-          else if (i === 2) { cls = "bronze"; medal = ""; }
+          else if (i === 1) { cls = "silver"; medal = "🥈"; }
+          else if (i === 2) { cls = "bronze"; medal = "🥉"; }
 
           return `
             <tr class="${cls}">
