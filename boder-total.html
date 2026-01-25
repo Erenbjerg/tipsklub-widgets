@@ -3,122 +3,121 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Bøder total</title>
+<title>Bødekassen Total</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
   *{box-sizing:border-box}
+
   html,body{
-    margin:0;padding:0;height:100%;
+    margin:0; padding:0; height:100%;
     background:transparent;
-    font-family:Inter,Arial,sans-serif;
-    display:flex;align-items:center;justify-content:center;
+    font-family:'Roboto', sans-serif;
+    display:flex; align-items:center; justify-content:center;
   }
-  .wrap{width:100%;padding:12px;display:flex;justify-content:center}
+
+  .wrap{
+    width:100%; padding:10px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
   .card{
-    width:100%;
-    max-width:520px;
-    border-radius:18px;
-    padding:18px;
+    background: rgba(20, 20, 20, 0.95);
+    border: 2px solid #C5A059; /* Guld kant */
+    border-radius: 22px;
+    padding: 22px;
     text-align:center;
-    border:1px solid #e5e7eb;
-    background:radial-gradient(900px 420px at top,#ffffff,#f8fafc);
-    box-shadow:0 8px 20px rgba(0,0,0,.08);
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.25);
+    max-width:520px; width:100%;
+    color: #fff;
+    display: flex; flex-direction: column; align-items: center;
   }
+
+  .icon {
+    font-size: 24px; margin-bottom: 8px;
+  }
+
   .label{
-    letter-spacing:.18em;
+    font-family: 'Playfair Display', serif;
+    letter-spacing:.2em;
     text-transform:uppercase;
-    font-size:12px;
-    color:#6b7280;
-    margin-bottom:8px;
-    font-weight:900;
+    font-size:13px;
+    color:#C5A059; /* Guld */
+    margin-bottom:6px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   }
+
   .amount{
-    font-size:44px;
-    font-weight:900;
-    line-height:1;
-    color:#991b1b;
-    text-shadow:0 0 18px rgba(153,27,27,.15);
+    font-size:48px; font-weight:900; line-height:1;
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
   }
-  .amount.good{color:#166534;text-shadow:0 0 18px rgba(22,101,52,.15)}
-  .unit{margin-top:6px;font-size:14px;font-weight:900;color:#9ca3af}
-  .sub{margin-top:10px;font-size:12px;color:#6b7280}
-  .err{margin-top:10px;font-size:12px;color:#b91c1c}
+
+  /* Når beløbet er højt, bliver det Guld/Grøn */
+  .amount.rich {
+    color: #39ff14; /* Neon grøn */
+    text-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+  }
+
+  .currency{
+    margin-top:6px; font-size:14px; font-weight:700;
+    color:#888; letter-spacing: 1px;
+  }
 </style>
 </head>
 
 <body>
 <div class="wrap">
   <div class="card">
-    <div class="label">Bøder total</div>
+    <div class="icon">💰</div>
+    <div class="label">Bødekassen</div>
     <div id="amount" class="amount">0</div>
-    <div class="unit">DKK</div>
-    <div id="sub" class="sub">Opdateres automatisk</div>
-    <div id="err" class="err"></div>
+    <div class="currency">Til festen</div>
   </div>
 </div>
 
 <script>
   // --- KONFIGURATION START ---
-  // Dette er ID'et til din nuværende 25/26 sæson.
-  // Hvis du ikke skriver "?id=..." i linket, bruges denne som standard.
-  const DEFAULT_ID = "AKfycbw7RzHmSwFOyN-JmLNR7qlt-prbVoOe5dEKkvOlus2LzZH2s7eJtwWceeIzysesubTj";
-
-  // Vi tjekker om linket indeholder "?id=NYT_ID"
+  const DEFAULT_ID = "AKfycby_L8hwDWMeesGsFA600IpggHgQir41tmSoST4YLQ7w8fYFdunit4KDaFhWt2CIYrKl";
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
-
-  // Vælg det rigtige ID: Linket vinder over standarden
   const scriptId = urlId || DEFAULT_ID;
   const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
   // --- KONFIGURATION SLUT ---
 
-  const fmt = n => Number(n || 0).toLocaleString("da-DK");
-  const setErr = msg => document.getElementById("err").innerText = msg || "";
-
   function animate(el, target){
     let current = 0;
-    const dir = target >= 0 ? 1 : -1;
-    const steps = 70;
-    const step = Math.max(1, Math.floor(Math.abs(target) / steps));
+    const steps = 60;
+    const step = Math.max(1, Math.floor(target / steps));
 
     const timer = setInterval(() => {
-      current += step * dir;
-      if ((dir === 1 && current >= target) || (dir === -1 && current <= target)) {
+      current += step;
+      if (current >= target) {
         current = target;
         clearInterval(timer);
       }
-      el.innerText = fmt(current);
+      el.innerText = current.toLocaleString("da-DK");
     }, 20);
   }
 
-  // Henter data (bruger en 'dummy' parameter for at undgå caching)
   fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
     .then(r => r.json())
     .then(d => {
-      if (!d || !("boderTotal" in d)) {
-        setErr("API svarer uden 'boderTotal'.");
-        return;
-      }
-
-      const val = Number(d.boderTotal);
-      if (!Number.isFinite(val)) {
-        setErr("Kunne ikke læse boderTotal: " + String(d.boderTotal));
-        return;
-      }
+      // Vi summerer alle bøderne manuelt for at være sikre
+      const rows = d.boder || [];
+      let sum = 0;
+      rows.forEach(r => {
+        sum += Number(r.total || 0);
+      });
 
       const el = document.getElementById("amount");
-      el.classList.remove("good");
-      if (val <= 0) el.classList.add("good");
-
-      setErr("");
-      animate(el, val);
+      if (sum > 0) el.classList.add("rich");
+      animate(el, sum);
     })
     .catch(e => {
-      setErr("Kunne ikke hente data.");
-      console.error(e);
+      document.getElementById("amount").innerText = "—";
     });
 </script>
 </body>
 </html>
-
-```
