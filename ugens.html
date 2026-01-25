@@ -3,118 +3,118 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ugens Tage/Adam</title>
+  <title>Ugens High Rollers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
     * { box-sizing: border-box; }
 
-    /* FJERN BAGGRUNDSFLADE */
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+      margin: 0; padding: 0; height: 100%;
       background: transparent;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: 'Roboto', sans-serif;
+      display: flex; align-items: center; justify-content: center;
     }
 
     .wrap {
-      width: 100%;
-      padding: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
+      width: 100%; padding: 10px;
+      display: flex; align-items: center; justify-content: center;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 1fr; /* 👈 Her er ændringen: 1 kolonne */
+      gap: 16px;
       width: 100%;
-      max-width: 520px;
+      max-width: 360px; /* Lidt smallere, så det ser pænt ud stablet */
     }
 
-    /* KORTENE er det eneste med baggrund */
     .card {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 4px 10px rgba(0,0,0,.08);
+      background: rgba(20, 20, 20, 0.95);
+      border: 2px solid #C5A059; /* Guld kant */
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
+      color: #fff;
+      display: flex; flex-direction: column; justify-content: space-between;
+      text-align: center; /* Centreret tekst ser godt ud på kortene */
     }
 
     h3 {
-      margin: 0 0 6px 0;
-      font-size: 14px;
-      color: #374151;
-      text-transform: uppercase;
-      letter-spacing: .04em;
+      margin: 0 0 8px 0;
+      font-family: 'Playfair Display', serif;
+      font-size: 14px; color: #C5A059;
+      text-transform: uppercase; letter-spacing: .05em;
+      border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+      padding-bottom: 6px;
     }
 
     .name {
-      font-size: 22px;
-      font-weight: 900;
-      margin: 4px 0 6px 0;
+      font-size: 22px; font-weight: 900;
+      margin: 4px 0 8px 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
       word-break: break-word;
     }
 
     .blurb {
-      font-size: 14px;
-      line-height: 1.4;
-      color: #111827;
+      font-size: 13px; line-height: 1.4;
+      color: #ccc; font-style: italic;
+      margin-bottom: 12px;
     }
 
     .pill {
       display: inline-block;
-      margin-top: 10px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
+      padding: 6px 14px; border-radius: 999px;
+      font-size: 11px; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin: 0 auto; /* Centrerer pillen */
     }
 
-    .tage { background:#fef3c7; color:#92400e; }
-    .adam { background:#e0e7ff; color:#3730a3; }
+    /* Tage: Neon Rød stil */
+    .tage .pill {
+      background: rgba(153, 27, 27, 0.2);
+      border: 1px solid #ef4444; color: #ef4444;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Adam: Neon Blå stil */
+    .adam .pill {
+      background: rgba(55, 48, 163, 0.2);
+      border: 1px solid #6366f1; color: #6366f1;
+      box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+    }
   </style>
 </head>
 <body>
 
 <div class="wrap">
   <div class="grid">
-    <div class="card">
-      <h3>Ugens Tage</h3>
+    <div class="card tage">
+      <h3>🎭 Ugens Tage</h3>
       <div class="name" id="tageName">Indlæser…</div>
       <div class="blurb" id="tageBlurb"></div>
-      <div class="pill tage">🥐 Missede den sikre</div>
+      <div class="pill">🥐 Missede den sikre</div>
     </div>
 
-    <div class="card">
-      <h3>Ugens Adam</h3>
+    <div class="card adam">
+      <h3>🎯 Ugens Adam</h3>
       <div class="name" id="adamName">Indlæser…</div>
       <div class="blurb" id="adamBlurb"></div>
-      <div class="pill adam">🎯 Missede longshot</div>
+      <div class="pill">🎲 Missede longshot</div>
     </div>
   </div>
 </div>
 
 <script>
   // --- KONFIGURATION START ---
-  // Dette er ID'et til din nuværende 25/26 sæson.
   const DEFAULT_ID = "AKfycbxfajkxsjkwidsABjzygBzNpfpXMXAUCRICUduFICK_F3buA7DPC7zTsg2RCRr963yI";
-
-  // Tjekker om linket har ?id=...
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
-
-  // Vælger ID: Linket vinder, ellers standard
   const scriptId = urlId || DEFAULT_ID;
   const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
   // --- KONFIGURATION SLUT ---
 
   const esc = s => (s ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
   const tageName = document.getElementById('tageName');
   const tageBlurb = document.getElementById('tageBlurb');
   const adamName = document.getElementById('adamName');
@@ -133,6 +133,5 @@
       adamName.innerText = '—';
     });
 </script>
-
 </body>
 </html>
