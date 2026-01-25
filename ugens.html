@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ugens Tage/Adam</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    /* FJERN BAGGRUNDSFLADE */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: transparent;
+      font-family: Arial, sans-serif;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wrap {
+      width: 100%;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* KORTENE er det eneste med baggrund */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.08);
+    }
+
+    h3 {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .name {
+      font-size: 22px;
+      font-weight: 900;
+      margin: 4px 0 6px 0;
+      word-break: break-word; /* Sikrer at lange navne ikke ødelægger layout */
+    }
+
+    .blurb {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #111827;
+    }
+
+    .pill {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .tage { background:#fef3c7; color:#92400e; }
+    .adam { background:#e0e7ff; color:#3730a3; }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <h3>Ugens Tage</h3>
+      <div class="name" id="tageName">Indlæser…</div>
+      <div class="blurb" id="tageBlurb"></div>
+      <div class="pill tage">🥐 Missede den sikre</div>
+    </div>
+
+    <div class="card">
+      <h3>Ugens Adam</h3>
+      <div class="name" id="adamName">Indlæser…</div>
+      <div class="blurb" id="adamBlurb"></div>
+      <div class="pill adam">🎯 Missede longshot</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- KONFIGURATION START ---
+  // Dette er ID'et fra din nuværende 'integrer kode' boks.
+  const DEFAULT_ID = "AKfycbxfajkxsjkwidsABjzygBzNpfpXMXAUCRICUduFICK_F3buA7DPC7zTsg2RCRr963yI";
+
+  // Tjekker om linket har ?id=...
+  const params = new URLSearchParams(window.location.search);
+  const urlId = params.get("id");
+
+  // Vælger ID: Linket vinder, ellers standard
+  const scriptId = urlId || DEFAULT_ID;
+  const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
+  // --- KONFIGURATION SLUT ---
+
+  const esc = s => (s ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  // Henter elementerne sikkert
+  const tageName = document.getElementById('tageName');
+  const tageBlurb = document.getElementById('tageBlurb');
+  const adamName = document.getElementById('adamName');
+  const adamBlurb = document.getElementById('adamBlurb');
+
+  fetch(API_URL + "?_=" + Date.now(), {cache:'no-store'})
+    .then(r=>r.json())
+    .then(d=>{
+      tageName.innerText = d.tage.name || '—';
+      tageBlurb.innerText = esc(d.tage.blurb || '');
+      adamName.innerText = d.adam.name || '—';
+      adamBlurb.innerText = esc(d.adam.blurb || '');
+    })
+    .catch(()=>{
+      tageName.innerText = '—';
+      adamName.innerText = '—';
+    });
+</script>
+
+</body>
+</html>
