@@ -3,33 +3,72 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fuld stilling</title>
+  <title>Fuld Stilling</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
   <style>
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:#f9fafb;font-family:Arial,sans-serif}
-    .wrap{padding:10px}
-    .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px;box-shadow:0 4px 10px rgba(0,0,0,.06)}
-    h3{margin:0 0 10px 0;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:#374151}
+    html,body{
+      margin:0;padding:0; background:transparent;
+      font-family:'Roboto', sans-serif;
+    }
+    .wrap{padding:10px;}
+    
+    .card{
+      background: rgba(20, 20, 20, 0.95);
+      border: 2px solid #C5A059;
+      border-radius:14px; padding:12px;
+      box-shadow:0 0 20px rgba(197, 160, 89, 0.2);
+      color: #fff;
+    }
+    
+    h3{
+      margin:0 0 10px 0;
+      font-family: 'Playfair Display', serif;
+      font-size:16px; color:#C5A059;
+      letter-spacing:.04em; text-transform:uppercase;
+      border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+      padding-bottom: 8px;
+    }
 
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #f3f4f6;font-size:13px}
-    th{text-align:left;color:#6b7280;font-weight:900}
-    td.num{text-align:right;font-weight:900}
-    td.rank{font-weight:900;width:28px}
+    table{width:100%; border-collapse:collapse;}
+    th,td{padding:12px 8px; border-bottom:1px solid rgba(255,255,255,0.1); font-size:14px;}
+    
+    th{
+      text-align:left; color:#888; font-weight:900;
+      text-transform: uppercase; font-size: 11px;
+    }
+    
+    td.rank{ font-family: 'Playfair Display', serif; color: #C5A059; font-weight:900; width:30px;}
+    td.name{ font-weight: 700; }
+    
+    /* CHIP SCORE */
+    .chip {
+      display: inline-block;
+      min-width: 30px; height: 30px; line-height: 30px;
+      border-radius: 50%;
+      background: #1f2937; border: 1px solid #374151;
+      text-align: center; font-weight: 900; font-size: 12px;
+    }
 
-    tr.gold{background:#fff7cc}
-    tr.silver{background:#f3f4f6}
-    tr.bronze{background:#fde7d9}
+    /* Top 3 Highlighting */
+    tr.gold td { color: #fbbf24; }
+    tr.gold .chip { background: radial-gradient(circle, #fbbf24, #b45309); color: #000; border-color:#fff; }
+    
+    tr.silver td { color: #e5e7eb; }
+    tr.silver .chip { background: radial-gradient(circle, #f3f4f6, #9ca3af); color: #000; border-color:#fff; }
+    
+    tr.bronze td { color: #fdba74; }
+    tr.bronze .chip { background: radial-gradient(circle, #fdba74, #c2410c); color: #000; border-color:#fff; }
 
-    .medal{margin-right:6px}
-
-    .scroll{max-height:520px;overflow:auto;border-radius:12px}
+    .medal{margin-right:6px;}
+    .scroll{max-height:520px; overflow:auto; border-radius:8px;}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h3>Fuld stilling</h3>
+      <h3>♠️ Fuld stilling</h3>
       <div class="scroll">
         <table>
           <thead>
@@ -40,7 +79,7 @@
             </tr>
           </thead>
           <tbody id="rows">
-            <tr><td colspan="3">Indlæser…</td></tr>
+            <tr><td colspan="3">Blander kortene…</td></tr>
           </tbody>
         </table>
       </div>
@@ -49,21 +88,15 @@
 
   <script>
     // --- KONFIGURATION START ---
-    // Dette er ID'et til din nuværende 25/26 sæson.
     const DEFAULT_ID = "AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH";
-
-    // Tjekker om linket har ?id=...
     const params = new URLSearchParams(window.location.search);
     const urlId = params.get("id");
-
-    // Vælger ID: Linket vinder, ellers standard
     const scriptId = urlId || DEFAULT_ID;
     const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
     // --- KONFIGURATION SLUT ---
 
     const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
-    // Tilføjer timestamp for at undgå cache (?_=...)
     fetch(API_URL + "?_=" + Date.now(), { cache: "no-store" })
       .then(r => r.json())
       .then(d => {
@@ -79,15 +112,15 @@
           let cls = "";
           let medal = "";
 
-          if (i === 0) { cls = "gold"; medal = "🥇"; }
-          else if (i === 1) { cls = "silver"; medal = "🥈"; }
-          else if (i === 2) { cls = "bronze"; medal = "🥉"; }
+          if (i === 0) { cls = "gold"; medal = "🏆"; }
+          else if (i === 1) { cls = "silver"; medal = ""; }
+          else if (i === 2) { cls = "bronze"; medal = ""; }
 
           return `
             <tr class="${cls}">
               <td class="rank">${i+1}</td>
-              <td>${medal ? `<span class="medal">${medal}</span>` : ``}${esc(p.name)}</td>
-              <td class="num">${esc(p.hits ?? 0)}</td>
+              <td class="name">${medal ? `<span class="medal">${medal}</span>` : ``}${esc(p.name)}</td>
+              <td style="text-align:right;"><span class="chip">${esc(p.hits ?? 0)}</span></td>
             </tr>
           `;
         }).join("");
@@ -99,5 +132,3 @@
   </script>
 </body>
 </html>
-
-```
