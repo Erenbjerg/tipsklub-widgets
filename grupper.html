@@ -23,29 +23,44 @@
       display:flex; justify-content:center;
     }
 
+    /* Standard: 3 kolonner (Computer) */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr; 
-      gap: 16px; /* Mere luft mellem kasserne */
-      width: 100%; max-width: 1000px; /* Tillad dem at blive bredere */
+      gap: 16px;
+      width: 100%; max-width: 1000px; 
     }
+
+    /* --- MOBIL FIX START --- */
+    /* Hvis skærmen er mindre end 600px bred (mobil), skift til 1 kolonne */
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr; /* Kun 1 kolonne */
+        gap: 20px; /* Lidt mere luft mellem dem vertikalt */
+      }
+      .card {
+        padding: 15px; /* Lidt mindre polstring på mobil */
+      }
+      h3 { font-size: 18px; } /* Lidt mindre overskrift på mobil */
+    }
+    /* --- MOBIL FIX SLUT --- */
 
     .card {
       background: rgba(20, 20, 20, 0.95);
       border: 2px solid #C5A059;
       border-radius: 16px;
-      padding: 20px 10px; /* Meget mere luft indeni */
+      padding: 20px 10px;
       box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
       color: #fff;
       text-align: center;
       display: flex; flex-direction: column;
-      min-height: 200px; /* Sikrer at de har en god højde selv med få navne */
+      min-height: 200px;
     }
 
     h3 {
       margin: 0 0 12px 0;
       font-family: 'Playfair Display', serif;
-      font-size: 20px; /* Større overskrift */
+      font-size: 20px;
       color: #C5A059;
       text-transform: uppercase; letter-spacing: .05em;
       border-bottom: 2px solid rgba(197, 160, 89, 0.3);
@@ -57,9 +72,9 @@
     ul { list-style: none; margin: 0; padding: 0; flex: 1; }
 
     li {
-      font-size: 16px; /* Større navne */
+      font-size: 16px;
       font-weight: 700; 
-      padding: 10px 0; /* Mere plads mellem navnene */
+      padding: 10px 0;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       color: #fff; letter-spacing: 0.5px;
     }
@@ -88,13 +103,11 @@
 </div>
 
 <script>
-  // --- KONFIGURATION START ---
   const DEFAULT_ID = "AKfycbz7F-b7fhMC3_uttHCShGxWyYQwPX_X6aKiYshLJHfr3aLFrdQll4IyF9ivCmN_NUDH";
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
   const scriptId = urlId || DEFAULT_ID;
   const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
-  // --- KONFIGURATION SLUT ---
 
   const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
