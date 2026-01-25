@@ -14,7 +14,6 @@
       height: 100%;
       background: transparent;
       font-family: Arial, sans-serif;
-
       display: flex;
       align-items: center;
       justify-content: center;
@@ -58,7 +57,7 @@
       font-size: 22px;
       font-weight: 900;
       margin: 4px 0 6px 0;
-      word-break: break-word; /* Sikrer at lange navne ikke ødelægger layout */
+      word-break: break-word;
     }
 
     .blurb {
@@ -102,7 +101,7 @@
 
 <script>
   // --- KONFIGURATION START ---
-  // Dette er ID'et fra din nuværende 'integrer kode' boks.
+  // Dette er ID'et til din nuværende 25/26 sæson.
   const DEFAULT_ID = "AKfycbxfajkxsjkwidsABjzygBzNpfpXMXAUCRICUduFICK_F3buA7DPC7zTsg2RCRr963yI";
 
   // Tjekker om linket har ?id=...
@@ -116,7 +115,6 @@
 
   const esc = s => (s ?? '').toString().replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  // Henter elementerne sikkert
   const tageName = document.getElementById('tageName');
   const tageBlurb = document.getElementById('tageBlurb');
   const adamName = document.getElementById('adamName');
