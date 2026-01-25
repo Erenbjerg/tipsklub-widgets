@@ -13,23 +13,24 @@
     margin:0; padding:0; height:100%;
     background:transparent;
     font-family:'Roboto', sans-serif;
-    display:flex; align-items:center; justify-content:center;
+    display:flex; 
+    align-items:flex-start; /* Starter i toppen */
+    justify-content:center;
   }
 
   .wrap{
-    width:100%; padding:10px;
+    width:100%; 
+    padding:10px;
+    padding-top: 20px; /* Plads til gløden i toppen */
     display:flex; align-items:center; justify-content:center;
   }
 
   .card{
-    /* Mørk baggrund */
     background: rgba(20, 20, 20, 0.9);
-    /* Guld kant */
     border: 2px solid #C5A059;
     border-radius: 22px;
     padding: 22px;
     text-align:center;
-    /* Glød */
     box-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
     max-width:520px; width:100%;
     color: #fff;
@@ -40,7 +41,7 @@
     letter-spacing:.2em;
     text-transform:uppercase;
     font-size:14px;
-    color:#C5A059; /* Guld */
+    color:#C5A059;
     margin-bottom:10px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   }
@@ -50,17 +51,8 @@
     font-family: 'Playfair Display', serif;
   }
   
-  /* Neon Grøn for overskud */
-  .amount.positive{
-    color:#39ff14; 
-    text-shadow:0 0 10px rgba(57, 255, 20, 0.6);
-  }
-  
-  /* Neon Rød for underskud */
-  .amount.negative{
-    color:#ff073a;
-    text-shadow:0 0 10px rgba(255, 7, 58, 0.6);
-  }
+  .amount.positive{ color:#39ff14; text-shadow:0 0 10px rgba(57, 255, 20, 0.6); }
+  .amount.negative{ color:#ff073a; text-shadow:0 0 10px rgba(255, 7, 58, 0.6); }
   
   .currency{
     margin-top:4px; font-size:16px; font-weight:700; 
@@ -81,13 +73,11 @@
 </div>
 
 <script>
-  // --- KONFIGURATION START ---
   const DEFAULT_ID = "AKfycbwPiEOeSOq9kUmm8-B9RaOlVJPzg9u3xaDScxOD-f2q4aFg_lFLAzC6N5Mv2Gs4gDOR";
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
   const scriptId = urlId || DEFAULT_ID;
   const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
-  // --- KONFIGURATION SLUT ---
 
   function setErr(msg){ document.getElementById("err").innerText = msg || ""; }
 
