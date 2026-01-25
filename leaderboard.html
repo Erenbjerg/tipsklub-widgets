@@ -14,22 +14,23 @@
       margin:0; padding:0; height:100%;
       background:transparent;
       font-family:'Roboto', sans-serif;
-      display:flex; align-items:center; justify-content:center;
+      display:flex; 
+      align-items:flex-start; /* Starter i toppen */
+      justify-content:center;
     }
 
     .wrap{
-      width:100%; padding:10px;
+      width:100%; 
+      padding:10px;
+      padding-top: 20px; /* Plads til gløden i toppen */
       display:flex; align-items:center; justify-content:center;
     }
 
     .card{
-      /* Mørk baggrund med let gennemsigtighed */
       background: rgba(20, 20, 20, 0.9); 
-      /* Guld kant */
       border: 2px solid #C5A059; 
       border-radius: 16px;
       padding: 16px;
-      /* Glød effekt */
       box-shadow: 0 0 15px rgba(197, 160, 89, 0.3);
       width:100%; max-width:420px;
       display: flex; flex-direction: column;
@@ -46,11 +47,11 @@
 
     h3{
       margin:0;
-      font-family: 'Playfair Display', serif; /* Casino font */
+      font-family: 'Playfair Display', serif;
       font-size: 18px;
       letter-spacing: .05em;
       text-transform: uppercase;
-      color: #C5A059; /* Guld */
+      color: #C5A059;
       text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
@@ -74,33 +75,28 @@
       color: #fff; letter-spacing: 0.5px;
     }
 
-    /* POKER CHIP DESIGN TIL POINT */
     .chip{
       width: 38px; height: 38px;
       border-radius: 50%;
-      background: radial-gradient(circle, #ef4444 40%, #991b1b 95%); /* Rød chip */
-      border: 2px dashed #fff; /* De hvide striber på en chip */
+      background: radial-gradient(circle, #ef4444 40%, #991b1b 95%);
+      border: 2px dashed #fff;
       box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-      
       display: flex; align-items: center; justify-content: center;
-      
       font-size:12px; font-weight:900; color:#fff;
       text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
     
-    /* Guld Chip til nr 1 */
     .row.gold .chip {
       background: radial-gradient(circle, #fbbf24 40%, #b45309 95%);
       border-color: #fff;
       color: #000; text-shadow: none;
     }
 
-    /* Vinder rækker highlight */
     .row.gold .name { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
     .medal{margin-right:6px; font-size: 18px;}
 
     @media (max-width:640px){
-      .wrap{padding:8px}
+      .wrap{padding:8px; padding-top:15px;}
     }
   </style>
 </head>
@@ -117,13 +113,11 @@
   </div>
 
   <script>
-    // --- KONFIGURATION START ---
     const DEFAULT_ID = "AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH";
     const params = new URLSearchParams(window.location.search);
     const urlId = params.get("id");
     const scriptId = urlId || DEFAULT_ID;
     const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
-    // --- KONFIGURATION SLUT ---
 
     const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
@@ -141,7 +135,7 @@
         el.innerHTML = stats.map((p, i) => {
           let cls = "";
           let medal = "";
-          if (i === 0) { cls = "gold"; medal = "🎰"; } // Jackpot ikon til nr 1
+          if (i === 0) { cls = "gold"; medal = "🎰"; }
           else if (i === 1) { cls = "silver"; medal = "🥈"; }
           else if (i === 2) { cls = "bronze"; medal = "🥉"; }
 
