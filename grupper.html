@@ -31,19 +31,17 @@
       width: 100%; max-width: 1000px; 
     }
 
-    /* --- MOBIL FIX START --- */
-    /* Hvis skærmen er mindre end 600px bred (mobil), skift til 1 kolonne */
-    @media (max-width: 600px) {
+    /* --- MOBIL FIX --- */
+    /* Når skærmen er under 768px (tablets og mobiler) skifter vi til 1 kolonne */
+    @media (max-width: 768px) {
       .grid {
         grid-template-columns: 1fr; /* Kun 1 kolonne */
-        gap: 20px; /* Lidt mere luft mellem dem vertikalt */
+        gap: 20px; /* God luft mellem kasserne vertikalt */
       }
       .card {
-        padding: 15px; /* Lidt mindre polstring på mobil */
+        padding: 20px; /* Sørger for god plads indeni */
       }
-      h3 { font-size: 18px; } /* Lidt mindre overskrift på mobil */
     }
-    /* --- MOBIL FIX SLUT --- */
 
     .card {
       background: rgba(20, 20, 20, 0.95);
@@ -103,6 +101,7 @@
 </div>
 
 <script>
+  // DIT ID ER HER:
   const DEFAULT_ID = "AKfycbz7F-b7fhMC3_uttHCShGxWyYQwPX_X6aKiYshLJHfr3aLFrdQll4IyF9ivCmN_NUDH";
   const params = new URLSearchParams(window.location.search);
   const urlId = params.get("id");
