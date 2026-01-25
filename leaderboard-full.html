@@ -9,10 +9,19 @@
   <style>
     *{box-sizing:border-box}
     html,body{
-      margin:0;padding:0; background:transparent;
+      margin:0;padding:0; height: 100%;
+      background:transparent;
       font-family:'Roboto', sans-serif;
+      display:flex; 
+      align-items:flex-start; /* Starter i toppen */
+      justify-content:center;
     }
-    .wrap{padding:10px;}
+    .wrap{
+        width:100%; 
+        padding:10px;
+        padding-top: 20px; /* Plads til glød */
+        display:flex; align-items:center; justify-content:center;
+    }
     
     .card{
       background: rgba(20, 20, 20, 0.95);
@@ -20,6 +29,8 @@
       border-radius:14px; padding:12px;
       box-shadow:0 0 20px rgba(197, 160, 89, 0.2);
       color: #fff;
+      width: 100%;
+      max-width: 500px; /* Lidt bredere tabel */
     }
     
     h3{
@@ -42,7 +53,6 @@
     td.rank{ font-family: 'Playfair Display', serif; color: #C5A059; font-weight:900; width:30px;}
     td.name{ font-weight: 700; }
     
-    /* CHIP SCORE */
     .chip {
       display: inline-block;
       min-width: 30px; height: 30px; line-height: 30px;
@@ -62,7 +72,11 @@
     tr.bronze .chip { background: radial-gradient(circle, #fdba74, #c2410c); color: #000; border-color:#fff; }
 
     .medal{margin-right:6px;}
-    .scroll{max-height:520px; overflow:auto; border-radius:8px;}
+    
+    /* HER ER RETTELSEN: scroll klassen gør ingenting nu, så den fylder det hele */
+    .scroll{
+      border-radius:8px;
+    }
   </style>
 </head>
 <body>
@@ -87,13 +101,11 @@
   </div>
 
   <script>
-    // --- KONFIGURATION START ---
     const DEFAULT_ID = "AKfycbwEZfTv0Bq52l-Nm_NiOpJFf_tWukgrqAM2NgCQjitZf2EuZb3XO2bNGyO1ZR82gbjH";
     const params = new URLSearchParams(window.location.search);
     const urlId = params.get("id");
     const scriptId = urlId || DEFAULT_ID;
     const API_URL = "https://script.google.com/macros/s/" + scriptId + "/exec";
-    // --- KONFIGURATION SLUT ---
 
     const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
 
