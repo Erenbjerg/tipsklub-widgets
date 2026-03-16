@@ -3,135 +3,141 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Galleri</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
+  <title>Tur Galleri</title>
   <style>
     * { box-sizing: border-box; }
     html, body {
-      margin: 0; padding: 0; height: 100%;
+      margin: 0; padding: 0; 
       background: transparent;
-      font-family: 'Roboto', sans-serif;
-      overflow-x: hidden;
+      font-family: sans-serif;
     }
 
     .wrap {
-      width: 100%; padding: 15px; padding-top: 25px;
+      width: 100%; padding: 10px;
       display: flex; justify-content: center;
     }
 
-    /* Flexbox der lader billederne hoppe ned på næste linje automatisk */
-    .gallery {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px; /* Lidt mindre mellemrum for at få plads til flere */
-      justify-content: center;
-      width: 100%; max-width: 900px;
+    /* Gitteret til billederne */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      width: 100%; max-width: 1000px;
     }
 
-    .player {
-      display: flex; flex-direction: column; align-items: center;
-      width: 85px; /* Kompakt bredde */
-      animation: fadeIn 0.5s ease-out; /* Lille animation når de loades */
+    /* Firkantede kasser til oversigten */
+    .photo-wrap {
+      aspect-ratio: 1 / 1; 
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid rgba(197, 160, 89, 0.4);
+      cursor: pointer;
+      background: #222;
+      transition: all 0.2s ease;
     }
 
-    .avatar-wrap {
-      position: relative;
-      width: 75px; height: 75px;
+    .photo-wrap:hover {
+      border-color: #C5A059;
+      transform: scale(1.03);
     }
 
-    .avatar {
+    .photo {
       width: 100%; height: 100%;
-      border-radius: 50%; /* Gør billedet helt rundt */
-      object-fit: cover; /* Sørger for at billedet ikke bliver mast */
-      border: 3px solid #C5A059; /* Guld kant */
-      box-shadow: 0 0 20px rgba(197, 160, 89, 0.25);
-      background-color: #222;
-      transition: all 0.2s ease-in-out;
+      object-fit: cover; 
     }
 
-    /* Sej hover-effekt (kun på computer) */
-    .player:hover .avatar {
-      transform: scale(1.1) translateY(-5px);
-      border-color: #fbbf24;
-      box-shadow: 0 5px 25px rgba(197, 160, 89, 0.4);
+    /* --- POPUP (Når man klikker) --- */
+    .modal {
+      display: none; 
+      position: fixed; z-index: 1000;
+      left: 0; top: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      justify-content: center; align-items: center;
+      padding: 15px;
     }
 
-    .name {
-      margin-top: 10px;
-      color: #fff;
-      font-size: 13px; font-weight: 700;
-      text-align: center; letter-spacing: 0.3px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      width: 100%;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    .modal img {
+      max-width: 100%; max-height: 95vh;
+      border-radius: 6px;
+      border: 2px solid #C5A059;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .close-btn {
+      position: absolute; top: 15px; right: 25px;
+      color: #C5A059; font-size: 40px; font-weight: bold;
+      cursor: pointer; background: none; border: none;
     }
+
+    .loading { color: #888; text-align: center; width: 100%; grid-column: 1 / -1; padding: 20px;}
   </style>
 </head>
 <body>
 
   <div class="wrap">
-    <div id="gallery" class="gallery">
-      </div>
+    <div id="gallery" class="gallery-grid">
+      <div class="loading">Henter billeder... 📸</div>
+    </div>
+  </div>
+
+  <div id="imageModal" class="modal">
+    <button class="close-btn" onclick="closeModal()">&times;</button>
+    <img id="modalImage" src="" alt="Fuld størrelse">
   </div>
 
 <script>
-  // === KONFIGURATION ===
-  // Dit GitHub brugernavn og repository navn
+  // Opsætning: Henter fra mappen "billeder" i main
   const GITHUB_USER = "erenbjerg";
   const GITHUB_REPO = "tipsklub-widgets";
-  // === END KONFIGURATION ===
+  const FOLDER_NAME = "billeder"; 
 
-  // API URL til at hente indholdet af 'billeder' mappen
-  const API_URL = "https://api.github.com/repos/" + GITHUB_USER + "/" + GITHUB_REPO + "/contents/billeder";
-
+  const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_NAME}`;
   const gallery = document.getElementById("gallery");
-  const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  const modal = document.getElementById("imageModal");
+  const modalImg = document.getElementById("modalImage");
+
+  function openModal(imgUrl) {
+    modalImg.src = imgUrl;
+    modal.style.display = "flex";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+    modalImg.src = "";
+  }
+
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) { closeModal(); }
+  });
 
   fetch(API_URL)
     .then(r => r.json())
     .then(files => {
-      // Vi tager kun billedfiler (jpg, jpeg, png, gif)
-      const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-      const imageFiles = files.filter(file => {
-        if (file.type !== "file") return false;
-        const ext = file.name.split('.').pop().toLowerCase();
-        return allowedExtensions.includes(ext);
-      });
-
-      if (imageFiles.length === 0) {
-        gallery.innerHTML = "<div style='color:#aaa;'>Ingen billeder fundet i 'billeder' mappen.</div>";
+      if(files.message === "Not Found") {
+        gallery.innerHTML = "<div class='loading'>Kunne ikke finde mappen.</div>";
         return;
       }
 
-      gallery.innerHTML = imageFiles.map((file, index) => {
-        // Vi tager filnavnet uden extension og bruger det som navn
-        const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
-        
-        // Lav et flot navn: Første bogstav stort, resten småt (fx tage -> Tage)
-        const displayName = nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1);
-        
-        // Vi bruger file.download_url for at hente billedet direkte
-        // Vi tilføjer en lille forsinkelse på animationen for hvert billede
-        const delay = index * 0.05;
+      const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      const images = files.filter(f => {
+        if (f.type !== "file") return false;
+        const ext = f.name.split('.').pop().toLowerCase();
+        return allowedExts.includes(ext);
+      });
 
-        return `
-          <div class="player" style="animation-delay: ${delay}s">
-            <div class="avatar-wrap">
-              <img src="${esc(file.download_url)}" alt="${esc(displayName)}" class="avatar">
-            </div>
-            <div class="name">${esc(displayName)}</div>
-          </div>
-        `;
-      }).join("");
+      if (images.length === 0) {
+        gallery.innerHTML = "<div class='loading'>Ingen billeder i mappen endnu.</div>";
+        return;
+      }
+
+      gallery.innerHTML = images.map(file => `
+        <div class="photo-wrap" onclick="openModal('${file.download_url}')">
+          <img src="${file.download_url}" class="photo" loading="lazy">
+        </div>
+      `).join("");
     })
     .catch(e => {
-      gallery.innerHTML = "<div style='color:#aaa;'>Kunne ikke hente billeder.</div>";
+      gallery.innerHTML = "<div class='loading'>Fejl ved indlæsning.</div>";
       console.error(e);
     });
 </script>
