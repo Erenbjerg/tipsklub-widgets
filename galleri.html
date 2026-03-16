@@ -3,118 +3,119 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tur Galleri</title>
+  <title>Tur Karrusel</title>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      margin: 0; padding: 0; 
       background: transparent;
       font-family: sans-serif;
+      display: flex; justify-content: center; align-items: center;
+      height: 100%; width: 100%;
+      overflow: hidden;
     }
 
     .wrap {
-      width: 100%; padding: 10px;
-      display: flex; justify-content: center;
+      width: 100%; 
+      max-width: 900px; /* Max bredde på computer */
+      padding: 10px;
     }
 
-    /* Gitteret til billederne */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-      width: 100%; max-width: 1000px;
-    }
-
-    /* Firkantede kasser til oversigten */
-    .photo-wrap {
-      aspect-ratio: 1 / 1; 
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid rgba(197, 160, 89, 0.4);
-      cursor: pointer;
-      background: #222;
-      transition: all 0.2s ease;
-    }
-
-    .photo-wrap:hover {
-      border-color: #C5A059;
-      transform: scale(1.03);
-    }
-
-    .photo {
-      width: 100%; height: 100%;
-      object-fit: cover; 
-    }
-
-    /* --- POPUP (Når man klikker) --- */
-    .modal {
-      display: none; 
-      position: fixed; z-index: 1000;
-      left: 0; top: 0; width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.9);
-      justify-content: center; align-items: center;
-      padding: 15px;
-    }
-
-    .modal img {
-      max-width: 100%; max-height: 95vh;
-      border-radius: 6px;
+    /* Karrusel Containeren */
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 450px; /* Højden på diasshowet - kan rettes! */
+      border-radius: 12px;
       border: 2px solid #C5A059;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      overflow: hidden;
+      background: #111;
     }
 
-    .close-btn {
-      position: absolute; top: 15px; right: 25px;
-      color: #C5A059; font-size: 40px; font-weight: bold;
-      cursor: pointer; background: none; border: none;
+    /* Sporet som billederne ligger på (den der glider) */
+    .carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.6s ease-in-out; /* Den bløde glide-animation */
     }
 
-    .loading { color: #888; text-align: center; width: 100%; grid-column: 1 / -1; padding: 20px;}
+    /* Selve billedet */
+    .slide {
+      min-width: 100%;
+      height: 100%;
+      object-fit: cover; /* Sørger for at billedet fylder rammen ud uden at blive mast */
+    }
+
+    /* Knapper til frem/tilbage */
+    .btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(20, 20, 20, 0.6);
+      color: #C5A059;
+      border: 1px solid rgba(197, 160, 89, 0.5);
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      font-size: 24px; font-weight: bold;
+      cursor: pointer;
+      display: flex; justify-content: center; align-items: center;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+
+    .btn:hover {
+      background: rgba(197, 160, 89, 0.9);
+      color: #000;
+    }
+
+    .btn-prev { left: 10px; }
+    .btn-next { right: 10px; }
+
+    .loading { 
+      color: #C5A059; text-align: center; width: 100%; 
+      position: absolute; top: 50%; transform: translateY(-50%);
+      font-style: italic; font-size: 18px;
+    }
   </style>
 </head>
 <body>
 
   <div class="wrap">
-    <div id="gallery" class="gallery-grid">
-      <div class="loading">Henter billeder... 📸</div>
+    <div class="carousel" id="carousel-container">
+      <div class="loading" id="loader">Henter billeder... 📸</div>
+      
+      <button class="btn btn-prev" id="prevBtn" style="display:none;">&#10094;</button>
+      <button class="btn btn-next" id="nextBtn" style="display:none;">&#10095;</button>
+
+      <div class="carousel-track" id="track"></div>
     </div>
   </div>
 
-  <div id="imageModal" class="modal">
-    <button class="close-btn" onclick="closeModal()">&times;</button>
-    <img id="modalImage" src="" alt="Fuld størrelse">
-  </div>
-
 <script>
-  // Opsætning: Henter fra mappen "billeder" i main
+  // Opsætning
   const GITHUB_USER = "erenbjerg";
   const GITHUB_REPO = "tipsklub-widgets";
   const FOLDER_NAME = "billeder"; 
+  const AUTO_PLAY_SPEED = 4000; // 4000 millisekunder = 4 sekunder pr. billede
 
   const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${FOLDER_NAME}`;
-  const gallery = document.getElementById("gallery");
+  
+  const track = document.getElementById("track");
+  const loader = document.getElementById("loader");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const carouselContainer = document.getElementById("carousel-container");
 
-  const modal = document.getElementById("imageModal");
-  const modalImg = document.getElementById("modalImage");
+  let slidesCount = 0;
+  let currentIndex = 0;
+  let autoPlayInterval;
 
-  function openModal(imgUrl) {
-    modalImg.src = imgUrl;
-    modal.style.display = "flex";
-  }
-
-  function closeModal() {
-    modal.style.display = "none";
-    modalImg.src = "";
-  }
-
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) { closeModal(); }
-  });
-
+  // Hent billeder fra GitHub
   fetch(API_URL)
     .then(r => r.json())
     .then(files => {
       if(files.message === "Not Found") {
-        gallery.innerHTML = "<div class='loading'>Kunne ikke finde mappen.</div>";
+        loader.innerText = "Kunne ikke finde mappen.";
         return;
       }
 
@@ -126,21 +127,74 @@
       });
 
       if (images.length === 0) {
-        gallery.innerHTML = "<div class='loading'>Ingen billeder i mappen endnu.</div>";
+        loader.innerText = "Ingen billeder i mappen endnu.";
         return;
       }
 
-      gallery.innerHTML = images.map(file => `
-        <div class="photo-wrap" onclick="openModal('${file.download_url}')">
-          <img src="${file.download_url}" class="photo" loading="lazy">
-        </div>
+      // Fjern loading tekst og vis knapper
+      loader.style.display = "none";
+      if(images.length > 1) {
+        prevBtn.style.display = "flex";
+        nextBtn.style.display = "flex";
+      }
+
+      slidesCount = images.length;
+
+      // Byg billederne ind i sporet
+      track.innerHTML = images.map(file => `
+        <img src="${file.download_url}" class="slide" loading="lazy">
       `).join("");
+
+      // Start karrusellen
+      startAutoPlay();
+
     })
     .catch(e => {
-      gallery.innerHTML = "<div class='loading'>Fejl ved indlæsning.</div>";
+      loader.innerText = "Fejl ved indlæsning.";
       console.error(e);
     });
-</script>
 
+  // Karrusel Logik
+  function moveToSlide(index) {
+    if (index < 0) {
+      currentIndex = slidesCount - 1; // Gå til sidste billede, hvis vi er ved det første
+    } else if (index >= slidesCount) {
+      currentIndex = 0; // Gå tilbage til start, hvis vi er ved det sidste
+    } else {
+      currentIndex = index;
+    }
+    
+    // Ryk sporet til venstre baseret på index (100% pr. billede)
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+  }
+
+  // Knap funktioner
+  prevBtn.addEventListener('click', () => {
+    moveToSlide(currentIndex - 1);
+    resetAutoPlay(); // Genstart timeren, når man klikker manuelt
+  });
+
+  nextBtn.addEventListener('click', () => {
+    moveToSlide(currentIndex + 1);
+    resetAutoPlay();
+  });
+
+  // Auto-play funktioner
+  function startAutoPlay() {
+    autoPlayInterval = setInterval(() => {
+      moveToSlide(currentIndex + 1);
+    }, AUTO_PLAY_SPEED);
+  }
+
+  function resetAutoPlay() {
+    clearInterval(autoPlayInterval);
+    startAutoPlay();
+  }
+
+  // Sæt på pause når musen holdes over karrusellen
+  carouselContainer.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+  carouselContainer.addEventListener('mouseleave', startAutoPlay);
+
+</script>
 </body>
 </html>
