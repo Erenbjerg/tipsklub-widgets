@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Galleri</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: transparent;
+      font-family: 'Roboto', sans-serif;
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      width: 100%; padding: 15px; padding-top: 25px;
+      display: flex; justify-content: center;
+    }
+
+    /* Flexbox der lader billederne hoppe ned på næste linje automatisk */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px; /* Lidt mindre mellemrum for at få plads til flere */
+      justify-content: center;
+      width: 100%; max-width: 900px;
+    }
+
+    .player {
+      display: flex; flex-direction: column; align-items: center;
+      width: 85px; /* Kompakt bredde */
+      animation: fadeIn 0.5s ease-out; /* Lille animation når de loades */
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 75px; height: 75px;
+    }
+
+    .avatar {
+      width: 100%; height: 100%;
+      border-radius: 50%; /* Gør billedet helt rundt */
+      object-fit: cover; /* Sørger for at billedet ikke bliver mast */
+      border: 3px solid #C5A059; /* Guld kant */
+      box-shadow: 0 0 20px rgba(197, 160, 89, 0.25);
+      background-color: #222;
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Sej hover-effekt (kun på computer) */
+    .player:hover .avatar {
+      transform: scale(1.1) translateY(-5px);
+      border-color: #fbbf24;
+      box-shadow: 0 5px 25px rgba(197, 160, 89, 0.4);
+    }
+
+    .name {
+      margin-top: 10px;
+      color: #fff;
+      font-size: 13px; font-weight: 700;
+      text-align: center; letter-spacing: 0.3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      width: 100%;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <div id="gallery" class="gallery">
+      </div>
+  </div>
+
+<script>
+  // === KONFIGURATION ===
+  // Dit GitHub brugernavn og repository navn
+  const GITHUB_USER = "erenbjerg";
+  const GITHUB_REPO = "tipsklub-widgets";
+  // === END KONFIGURATION ===
+
+  // API URL til at hente indholdet af 'billeder' mappen
+  const API_URL = "https://api.github.com/repos/" + GITHUB_USER + "/" + GITHUB_REPO + "/contents/billeder";
+
+  const gallery = document.getElementById("gallery");
+  const esc = s => (s ?? "").toString().replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+  fetch(API_URL)
+    .then(r => r.json())
+    .then(files => {
+      // Vi tager kun billedfiler (jpg, jpeg, png, gif)
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+      const imageFiles = files.filter(file => {
+        if (file.type !== "file") return false;
+        const ext = file.name.split('.').pop().toLowerCase();
+        return allowedExtensions.includes(ext);
+      });
+
+      if (imageFiles.length === 0) {
+        gallery.innerHTML = "<div style='color:#aaa;'>Ingen billeder fundet i 'billeder' mappen.</div>";
+        return;
+      }
+
+      gallery.innerHTML = imageFiles.map((file, index) => {
+        // Vi tager filnavnet uden extension og bruger det som navn
+        const nameWithoutExt = file.name.split('.').slice(0, -1).join('.');
+        
+        // Lav et flot navn: Første bogstav stort, resten småt (fx tage -> Tage)
+        const displayName = nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1);
+        
+        // Vi bruger file.download_url for at hente billedet direkte
+        // Vi tilføjer en lille forsinkelse på animationen for hvert billede
+        const delay = index * 0.05;
+
+        return `
+          <div class="player" style="animation-delay: ${delay}s">
+            <div class="avatar-wrap">
+              <img src="${esc(file.download_url)}" alt="${esc(displayName)}" class="avatar">
+            </div>
+            <div class="name">${esc(displayName)}</div>
+          </div>
+        `;
+      }).join("");
+    })
+    .catch(e => {
+      gallery.innerHTML = "<div style='color:#aaa;'>Kunne ikke hente billeder.</div>";
+      console.error(e);
+    });
+</script>
+
+</body>
+</html>
